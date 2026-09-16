@@ -216,6 +216,9 @@ all = [
     "bnlearn>=0.14.0",
 
 ]
+cpomdp = [
+    "cpomdp>=0.4.4,<0.5",
+]
 
 # Development tooling (PEP 735 dependency group). Installed by default via
 # ``[tool.uv] default-groups = ["dev"]`` so a fresh ``uv run`` gets the full
@@ -356,6 +359,7 @@ module = [
     "pytest_cov.*",
     "discopy.*",
     "pymdp.*",
+    "cpomdp.*",
     "ray.*",
     "requests.*",
     "scipy.*",
