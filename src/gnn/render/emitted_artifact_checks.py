@@ -179,7 +179,9 @@ def matrix_shapes(code: str) -> "dict[str, tuple[int, ...]] | None":
     - pymdp delegated runners: ``A_data = [...]`` plain list literals;
     - jax: ``'A_matrix': jnp.array([...])`` dict-payload calls;
     - pytorch: ``A = torch.tensor([...])`` plus ``B_slices.append(...)``;
-    - numpyro: ``A = jnp.array([...])`` plus ``B_slices.append(...)``.
+    - numpyro: ``A = jnp.array([...])`` plus ``B_slices.append(...)``;
+    - cpomdp: continuous only (``F_RAW = [...]`` literals, no A/B/C/D) —
+      never matched here.
 
     Returns None when the module uses a star import (conservative skip - the
     same rule as :func:`undefined_names`). Only letters with a clean

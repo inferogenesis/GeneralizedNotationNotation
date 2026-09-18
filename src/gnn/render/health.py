@@ -65,6 +65,7 @@ _FRAMEWORK_REMEDIATIONS: dict[str, str] = {
     "pytorch": "Add torch: uv add torch",
     "bnlearn": "Add bnlearn (or R bnlearn bridge): uv add bnlearn",
     "numpyro": "Add numpyro: uv add numpyro",
+    "cpomdp": "Add cpomdp: uv add cpomdp (or uv sync --extra cpomdp)",
     "stan": "Add cmdstanpy: uv add cmdstanpy",
     "discopy": "Add discopy: uv add discopy",
     "jax": "Add jax: uv add jax jaxlib",

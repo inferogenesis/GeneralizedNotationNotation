@@ -163,6 +163,33 @@ FRAMEWORK_REGISTRY: Mapping[str, Dict[str, Any]] = MappingProxyType(
             "supports_continuous": True,
             "unavailable_reason": None,
         },
+        "cpomdp": {
+            "name": "cpomdp",
+            "description": "Continuous active inference (Kalman filter + enumerated expected-free-energy search)",
+            "language": "Python",
+            "file_extension": ".py",
+            "supported_features": [
+                "Continuous Active Inference",
+                "Expected Free Energy",
+                "State-Dependent Observation Noise",
+                "JAX Backend",
+            ],
+            "function": "render_gnn_to_cpomdp",
+            "output_format": "python",
+            # Routed through the POMDP processor like every backend, but it is
+            # the continuous-state sibling of pymdp: discrete specs report the
+            # render status ``unsupported`` (see ``supports_discrete``).
+            "pomdp_compatible": True,
+            "supports_discrete": False,
+            "requires_matrices": [],
+            "optional_matrices": [],
+            "supports_multi_modality": False,
+            "supports_multi_factor": False,
+            "available": True,
+            "supports_execution": True,
+            "supports_continuous": True,
+            "unavailable_reason": None,
+        },
         "stan": {
             "name": "Stan",
             "description": "Stan probabilistic programming model generation",
@@ -248,6 +275,7 @@ def get_pomdp_framework_configs() -> Dict[str, Dict[str, Any]]:
             "supports_multi_factor": bool(spec["supports_multi_factor"]),
             "supports_execution": bool(spec.get("supports_execution", True)),
             "supports_continuous": bool(spec.get("supports_continuous", False)),
+            "supports_discrete": bool(spec.get("supports_discrete", True)),
             "name": spec["name"],
         }
         for name, spec in FRAMEWORK_REGISTRY.items()

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from .activeinference_jl import render_gnn_to_activeinference_jl
+from .cpomdp import render_gnn_to_cpomdp
 from .discopy import render_gnn_to_discopy
 from .framework_registry import get_supported_frameworks
 from .generators import (
@@ -89,6 +90,7 @@ __all__: list[Any] = [
     "render_gnn_to_activeinference_jl",
     "render_gnn_to_pytorch",
     "render_gnn_to_numpyro",
+    "render_gnn_to_cpomdp",
     "render_stan",
     # Renderer classes
     "PyMDPRenderer",
@@ -112,6 +114,7 @@ FEATURES: dict[str, Any] = {
     "jax_rendering": True,
     "pytorch_rendering": True,
     "numpyro_rendering": True,
+    "cpomdp_rendering": True,
     "stan_rendering": True,
     "mcp_integration": True,
     "pomdp_processing": True,

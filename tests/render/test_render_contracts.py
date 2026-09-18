@@ -396,6 +396,7 @@ class TestMaintainedOutputContracts:
             ("pytorch", CORPUS_CONTINUOUS),
             ("numpyro", CORPUS_DISCRETE),
             ("numpyro", CORPUS_CONTINUOUS),
+            ("cpomdp", CORPUS_CONTINUOUS),
             ("stan", CORPUS_DISCRETE),
             ("discopy", CORPUS_DISCRETE),
             ("bnlearn", CORPUS_BASICS),
@@ -445,7 +446,15 @@ class TestFailureMessageActionability:
     def test_get_remediation_covers_dependency_backends(self) -> None:
         from gnn.render.health import get_remediation
 
-        for framework in ("jax", "discopy", "pytorch", "numpyro", "stan", "bnlearn"):
+        for framework in (
+            "jax",
+            "discopy",
+            "pytorch",
+            "numpyro",
+            "cpomdp",
+            "stan",
+            "bnlearn",
+        ):
             hint = get_remediation(framework)
             assert hint is not None, framework
             assert "uv add" in hint or "julia" in hint.lower()

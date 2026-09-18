@@ -144,6 +144,16 @@ RENDERER_ROUTES: Dict[str, RendererRoute] = {
         result_mode="artifacts",
         artifacts_mode="returned",
     ),
+    "cpomdp": RendererRoute(
+        module=".cpomdp.cpomdp_renderer",
+        function="render_gnn_to_cpomdp",
+        suffix="_cpomdp.py",
+        label="cpomdp",
+        validate=False,
+        options_mode="timesteps",
+        result_mode="artifacts",
+        artifacts_mode="returned",
+    ),
     "stan": RendererRoute(
         module=".stan.stan_renderer",
         function="render_gnn_to_stan",
@@ -446,6 +456,19 @@ class POMDPRenderProcessor:
                     "structural-spec: no renderable form — declares boundary "
                     "structure only (no discrete A/B/C/D[/E] and no "
                     "continuous F/H/Q/R parameterization)"
+                ),
+                "warnings": warnings,
+            }
+
+        # Continuous-only backends (cpomdp) mirror the categorical case: a
+        # discrete POMDP is reported unsupported, never failed.
+        if not config.get("supports_discrete", True):
+            return {
+                "compatible": False,
+                "unsupported": True,
+                "reason": (
+                    f"discrete POMDP: {config.get('name', framework)} renders "
+                    "continuous (linear-Gaussian) models only"
                 ),
                 "warnings": warnings,
             }
@@ -1351,6 +1374,14 @@ class POMDPRenderProcessor:
         """Call NumPyro renderer."""
         return self._invoke_renderer(
             RENDERER_ROUTES["numpyro"], "numpyro", gnn_spec, output_dir, **kwargs
+        )
+
+    def _call_cpomdp_renderer(
+        self, gnn_spec: Dict[str, Any], output_dir: Path, **kwargs: Any
+    ) -> Dict[str, Any]:
+        """Call cpomdp renderer (continuous models only)."""
+        return self._invoke_renderer(
+            RENDERER_ROUTES["cpomdp"], "cpomdp", gnn_spec, output_dir, **kwargs
         )
 
     def _call_stan_renderer(

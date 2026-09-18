@@ -55,6 +55,9 @@ EXPECTED_AVAILABLE: set[str] = {
     # bnlearn joined when its dependency precondition was resolved by the
     # ``bnlearn`` extra (render-only backend; no Step 12 executor).
     "bnlearn",
+    # cpomdp renders continuous models only (optional ``cpomdp`` extra at
+    # execution time; rendering is codegen-only).
+    "cpomdp",
 }
 
 
@@ -292,3 +295,21 @@ class TestPomdpConfigTruthfulness:
         # bnlearn is render-only (no Step 12 executor) — the config must not
         # contradict the registry spec.
         assert configs["bnlearn"]["supports_execution"] is False
+
+    def test_supports_discrete_derived_from_registry(self) -> None:
+        from gnn.render.framework_registry import (
+            FRAMEWORK_REGISTRY,
+            get_pomdp_framework_configs,
+        )
+
+        configs = get_pomdp_framework_configs()
+        for name, spec in FRAMEWORK_REGISTRY.items():
+            if name in configs:
+                assert configs[name]["supports_discrete"] is bool(
+                    spec.get("supports_discrete", True)
+                )
+        # cpomdp is the continuous-only backend: routed, but discrete specs
+        # report ``unsupported``.
+        assert configs["cpomdp"]["supports_discrete"] is False
+        assert configs["cpomdp"]["supports_continuous"] is True
+        assert configs["pymdp"]["supports_discrete"] is True
