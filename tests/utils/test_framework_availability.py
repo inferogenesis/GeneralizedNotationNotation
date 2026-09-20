@@ -84,5 +84,13 @@ def test_unknown_framework_has_available_true_in_status() -> Any:
 def test_framework_import_check_includes_required_runners() -> Any:
     # Regression guard: Phase 0.2 must include every runner from executor.py.
     # Keep this list aligned with src/gnn/execute/executor.py framework runners.
-    required: set[Any] = {"jax", "numpyro", "pytorch", "discopy", "bnlearn", "pymdp"}
+    required: set[Any] = {
+        "jax",
+        "numpyro",
+        "cpomdp",
+        "pytorch",
+        "discopy",
+        "bnlearn",
+        "pymdp",
+    }
     assert required.issubset(FRAMEWORK_IMPORT_CHECK.keys())

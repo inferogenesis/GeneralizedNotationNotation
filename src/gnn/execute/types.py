@@ -23,6 +23,7 @@ ExecutionFrameworkName = Literal[
     "activeinference_jl",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "stan",
 ]
 

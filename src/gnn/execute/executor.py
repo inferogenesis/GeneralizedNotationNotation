@@ -68,6 +68,14 @@ except ImportError:
     run_numpyro_scripts = cast(Any, None)
 
 try:
+    from .cpomdp.cpomdp_runner import run_cpomdp_scripts
+
+    CPOMDP_AVAILABLE = True
+except ImportError:
+    CPOMDP_AVAILABLE = False
+    run_cpomdp_scripts = cast(Any, None)
+
+try:
     from .pytorch.pytorch_runner import run_pytorch_scripts
 
     PYTORCH_AVAILABLE = True
@@ -101,6 +109,7 @@ FRAMEWORK_DIR_NAMES: tuple[str, ...] = (
     "activeinference_jl",
     "jax",
     "numpyro",
+    "cpomdp",
     "pytorch",
     "lean",
 )
@@ -605,6 +614,23 @@ def _framework_specs() -> tuple[ExecutorFrameworkSpec, ...]:
             warning_log_prefix="NumPyro script execution failed",
         ),
         ExecutorFrameworkSpec(
+            framework_dir_key="cpomdp",
+            result_key="cpomdp_executions",
+            available=CPOMDP_AVAILABLE,
+            runner=run_cpomdp_scripts,
+            operation_name="execute_cpomdp_scripts",
+            start_message="🚀 Executing cpomdp scripts...",
+            success_message="cpomdp scripts executed successfully",
+            failure_message="cpomdp script execution failed",
+            unavailable_log=(
+                "ℹ️ cpomdp framework not available - skipping cpomdp execution "
+                "(install with: uv sync --extra cpomdp)"
+            ),
+            unavailable_message="cpomdp framework not installed (optional dependency)",
+            success_log="cpomdp script execution completed",
+            warning_log_prefix="cpomdp script execution failed",
+        ),
+        ExecutorFrameworkSpec(
             framework_dir_key="pytorch",
             result_key="pytorch_executions",
             available=PYTORCH_AVAILABLE,
@@ -936,6 +962,12 @@ def _write_execution_report(
         )
         _write_framework_report_section(
             f,
+            "cpomdp Executions",
+            execution_results["cpomdp_executions"],
+            "cpomdp Scripts",
+        )
+        _write_framework_report_section(
+            f,
             "PyTorch Executions",
             execution_results["pytorch_executions"],
             "PyTorch Scripts",
@@ -1131,7 +1163,7 @@ def execute_script_safely(
             "error_type": "ValueError",
         }
 
-    # SEC-R2: the registry runners (pymdp/jax/numpyro/pytorch/discopy) funnel
+    # SEC-R2: the registry runners (pymdp/jax/numpyro/cpomdp/pytorch/discopy) funnel
     # every rendered-script execution through this helper, so the
     # pre-execution security gate applies here before anything runs.
     gate_verdict = check_script_allowed(script)

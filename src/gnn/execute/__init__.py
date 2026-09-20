@@ -1,9 +1,10 @@
 """
 execute module for GNN Processing Pipeline.
 
-Provides simulation execution across nine backends — PyMDP, RxInfer.jl,
-ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan, and Lean (via the
-fep_lean bridge) — plus the dependency/environment validators that gate them.
+Provides simulation execution across ten backends — PyMDP, RxInfer.jl,
+ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan, and Lean
+(via the fep_lean bridge) — plus the dependency/environment validators that
+gate them.
 """
 
 from typing import Any
@@ -18,6 +19,7 @@ FEATURES: dict[str, Any] = {
     "jax_execution": True,
     "pytorch_execution": True,
     "numpyro_execution": True,
+    "cpomdp_execution": True,
     "validation": True,
     "mcp_integration": True,
 }
@@ -34,6 +36,7 @@ FrameworkName = Literal[
     "activeinference_jl",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "stan",
     "lean",
 ]

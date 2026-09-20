@@ -25,6 +25,7 @@ EXPECTED_FRAMEWORKS = {
     "activeinference_jl",
     "jax",
     "numpyro",
+    "cpomdp",
     "pytorch",
     "lean",
 }
@@ -51,6 +52,7 @@ def test_list_frameworks_result_keys_match_registry_order() -> None:
     assert by_fw["activeinference_jl"] == "activeinference_executions"
     assert by_fw["jax"] == "jax_executions"
     assert by_fw["numpyro"] == "numpyro_executions"
+    assert by_fw["cpomdp"] == "cpomdp_executions"
     assert by_fw["pytorch"] == "pytorch_executions"
 
 

@@ -127,7 +127,15 @@ def test_validate_frameworks_arg_accepts_mixed_known_and_unknown() -> Any:
 
 
 def test_known_frameworks_contains_all_runners() -> Any:
-    required: set[Any] = {"jax", "numpyro", "pytorch", "discopy", "bnlearn", "pymdp"}
+    required: set[Any] = {
+        "jax",
+        "numpyro",
+        "cpomdp",
+        "pytorch",
+        "discopy",
+        "bnlearn",
+        "pymdp",
+    }
     assert required.issubset(set(KNOWN_FRAMEWORKS))
 
 

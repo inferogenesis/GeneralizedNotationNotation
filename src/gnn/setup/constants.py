@@ -44,5 +44,6 @@ OPTIONAL_GROUPS: dict[str, Any] = {
     "graphs": "Graphviz bindings for graph rendering workflows",
     "research": "Research tools (jupyterlab, sympy, numba, cython)",
     "scaling": "Scaling (dask, distributed, ray)",
+    "cpomdp": "cpomdp continuous active inference backend for Step 12",
     "all": "All functionally distinct optional dependency groups combined",
 }

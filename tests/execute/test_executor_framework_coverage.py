@@ -27,6 +27,7 @@ EXPECTED_FRAMEWORK_KEYS: set[Any] = {
     "activeinference_executions",
     "jax_executions",
     "numpyro_executions",
+    "cpomdp_executions",
     "pytorch_executions",
     "lean_executions",
 }
@@ -77,8 +78,9 @@ def test_executor_covers_all_frameworks(tmp_path: Path) -> None:
     )
 
     framework_dirs = summary.get("framework_execution_dirs", {})
-    assert {"numpyro", "pytorch"}.issubset(framework_dirs.keys()), (
-        "numpyro/pytorch output directories not declared in framework_execution_dirs"
+    assert {"numpyro", "cpomdp", "pytorch"}.issubset(framework_dirs.keys()), (
+        "numpyro/cpomdp/pytorch output directories not declared in "
+        "framework_execution_dirs"
     )
 
 

@@ -257,7 +257,12 @@ def check_environment() -> PreflightReport:
             )
 
     # Optional packages
-    for pkg, purpose in [("pydantic", "schemas"), ("fastapi", "API"), ("pygls", "LSP")]:
+    for pkg, purpose in [
+        ("pydantic", "schemas"),
+        ("fastapi", "API"),
+        ("pygls", "LSP"),
+        ("cpomdp", "step 12 cpomdp backend, uv sync --extra cpomdp"),
+    ]:
         module, error = _import_dependency(pkg)
         if module is not None:
             report.add_pass(f"Optional: {pkg} ({purpose})")

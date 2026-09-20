@@ -181,6 +181,12 @@ def collect_execution_outputs(
             if numpyro_out.exists():
                 found_files.extend(numpyro_out.rglob("*.json"))
                 found_files.extend(numpyro_out.rglob("*.csv"))
+        elif framework == "cpomdp":
+            # cpomdp writes simulation_results.json under CPOMDP_OUTPUT_DIR (default: script cwd)
+            found_files.extend(script_dir.glob("simulation_results.json"))
+            cpomdp_out = script_dir / "cpomdp_outputs"
+            if cpomdp_out.exists():
+                found_files.extend(cpomdp_out.rglob("*.json"))
         elif framework == "pytorch":
             # PyTorch writes simulation_results.json under PYTORCH_OUTPUT_DIR (default: script cwd)
             found_files.extend(script_dir.glob("simulation_results.json"))
@@ -330,6 +336,10 @@ def extract_simulation_data_from_files(
         elif framework == "numpyro":
             enhanced_data = extract_pymdp_like_data_from_files(
                 output_dir, logger, "numpyro"
+            )
+        elif framework == "cpomdp":
+            enhanced_data = extract_pymdp_like_data_from_files(
+                output_dir, logger, "cpomdp"
             )
         elif framework == "pytorch":
             enhanced_data = extract_pymdp_like_data_from_files(

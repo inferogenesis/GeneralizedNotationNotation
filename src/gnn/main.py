@@ -405,6 +405,7 @@ def _log_backend_versions(logger: logging.Logger) -> None:
         ("jaxlib", "jaxlib"),
         ("torch", "torch"),
         ("numpyro", "numpyro"),
+        ("cpomdp", "cpomdp"),
         ("discopy", "discopy"),
     ):
         try:
