@@ -165,7 +165,9 @@ FRAMEWORK_REGISTRY: Mapping[str, Dict[str, Any]] = MappingProxyType(
         },
         "cpomdp": {
             "name": "cpomdp",
-            "description": "Continuous active inference (Kalman filter + enumerated expected-free-energy search)",
+            "description": (
+                "Continuous active inference (Kalman filter + EFE policy search)"
+            ),
             "language": "Python",
             "file_extension": ".py",
             "supported_features": [

@@ -954,7 +954,7 @@ The rendered files are organized in implementation-specific subfolders:
 │   ├── discopy/            # DisCoPy categorical diagrams
 │   ├── pytorch/            # PyTorch simulations
 │   ├── numpyro/            # NumPyro simulations
-│   ├── cpomdp/             # cpomdp continuous active inference (continuous models only)
+│   ├── cpomdp/             # cpomdp Python continuous simulations (continuous models only)
 │   ├── stan/               # Stan models
 │   └── bnlearn/            # Bayesian network scripts
 └── render_processing_summary.json  # Detailed results
