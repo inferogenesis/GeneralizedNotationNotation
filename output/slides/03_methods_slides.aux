@@ -55,7 +55,7 @@
     {3}{47.29402pt}\LT@entry
     {1}{24.29802pt}}
 \HyPL@Entry{12<</P(\376\377\0001\0003)>>}
-\newlabel{tbl:backend_registry}{{1}{13}{Render targets declared in \protect \breaktt {src/gnn/render/framework\_registry.py}, one row per registry key in registry order. The \emph {Executes} column is the registry's own \protect \breaktt {supports\_execution} flag: 9 of 9 backends have a Step-12 executor, and a \protect \texttt {render-only} entry would mean generated code with no Step-12 executor. Read this table against tbl.~5, which shows which families actually target each backend}{tbl:backend_registry}{}}
+\newlabel{tbl:backend_registry}{{1}{13}{Render targets declared in \protect \breaktt {src/gnn/render/framework\_registry.py}, one row per registry key in registry order. The \emph {Executes} column is the registry's own \protect \breaktt {supports\_execution} flag: 10 of 10 backends have a Step-12 executor, and a \protect \texttt {render-only} entry would mean generated code with no Step-12 executor. Read this table against tbl.~5, which shows which families actually target each backend}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {tbl:backend_registry}{13}}
 \@writefile{nav}{\headcommand {\slideentry {1}{3}{3}{13/13}{Rendering to Multiple Backends}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {13}{13}}}
@@ -68,7 +68,7 @@
     {1}{50.61801pt}\LT@entry
     {1}{42.17801pt}}
 \HyPL@Entry{14<</P(\376\377\0001\0005)>>}
-\newlabel{tbl:framework_capability}{{2}{15}{Model kinds each render framework supports, read entirely from the flags in \protect \breaktt {src/gnn/render/framework\_registry.py} --- the same source as tbl.~\ref {tbl:backend_registry}. A continuous cell of \protect \texttt {unsupported} is the renderer's own status for continuous-state models; a render-only entry has no Step-12 executor. Read with tbl.~1, which groups the same flags by model kind}{tbl:framework_capability}{}}
+\newlabel{tbl:framework_capability}{{2}{15}{Model kinds each render framework supports, read entirely from the flags in \protect \breaktt {src/gnn/render/framework\_registry.py} --- the same source as tbl.~\ref {tbl:backend_registry}. A continuous cell of \protect \texttt {unsupported} is the renderer's own status for continuous-state models; a render-only entry has no Step-12 executor. Read with tbl.~1, which groups the same flags by model kind}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {tbl:framework_capability}{15}}
 \@writefile{nav}{\headcommand {\slideentry {1}{3}{5}{15/15}{Rendering to Multiple Backends}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {15}{15}}}
@@ -76,12 +76,12 @@
 \@writefile{nav}{\headcommand {\slideentry {1}{3}{6}{16/16}{Rendering to Multiple Backends}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {16}{16}}}
 \HyPL@Entry{16<</P(\376\377\0001\0007)>>}
-\newlabel{fig:backend_matrix}{{1}{17}{The GNN rendering backend registry as a table: one row per registered backend, with its registry key, display name, implementation language, whether a render-output subdirectory exists under \protect \texttt {src/gnn/render/}, and its role in the cross-framework reference comparison. Amber rows are the backends the reliability gate profiles for the continuous family; the tan row (Stan) is declared by that family but sits outside the maintained set, so it is never profiled; a red Render-Subdir cell would mean a registry entry with no subdirectory. The table is read directly from \protect \breaktt {src/gnn/render/framework\_registry.py} and the model-family manifest at commit 524b2e4af, and its footer summarizes the row counts. Take-away: registration, render presence, and profiling status are three different claims, and the table keeps them apart}{fig:backend_matrix}{}}
+\newlabel{fig:backend_matrix}{{1}{17}{The GNN rendering backend registry as a table: one row per registered backend, with its registry key, display name, implementation language, whether a render-output subdirectory exists under \protect \texttt {src/gnn/render/}, and its role in the cross-framework reference comparison. Amber rows are the backends the reliability gate profiles for the continuous family; the tan row (Stan) is declared by that family but sits outside the maintained set, so it is never profiled; a red Render-Subdir cell would mean a registry entry with no subdirectory. The table is read directly from \protect \breaktt {src/gnn/render/framework\_registry.py} and the model-family manifest at commit 4832889, and its footer summarizes the row counts. Take-away: registration, render presence, and profiling status are three different claims, and the table keeps them apart}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {fig:backend_matrix}{17}}
 \@writefile{nav}{\headcommand {\slideentry {1}{3}{7}{17/17}{Rendering to Multiple Backends}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {17}{17}}}
 \HyPL@Entry{17<</P(\376\377\0001\0008)>>}
-\newlabel{rendering-by-model-kind}{{18}{18}{Rendering to Multiple Backends}{rendering-by-model-kind}{}}
+\newlabel{rendering-by-model-kind}{{18}{18}{Rendering to Multiple Backends}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {rendering-by-model-kind}{18}}
 \@writefile{nav}{\headcommand {\slideentry {1}{3}{8}{18/18}{Rendering to Multiple Backends}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {18}{18}}}
@@ -104,7 +104,7 @@
 \@writefile{nav}{\headcommand {\slideentry {1}{4}{1}{23/23}{Execution}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {23}{23}}}
 \HyPL@Entry{23<</P(\376\377\0002\0004)>>}
-\newlabel{executing-by-model-kind}{{24}{24}{Execution}{executing-by-model-kind}{}}
+\newlabel{executing-by-model-kind}{{24}{24}{Execution}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {executing-by-model-kind}{24}}
 \@writefile{nav}{\headcommand {\slideentry {1}{4}{2}{24/24}{Execution}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {24}{24}}}
@@ -130,7 +130,7 @@
 \@writefile{nav}{\headcommand {\slideentry {1}{5}{3}{30/30}{Long-Running Orchestration Contracts}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {30}{30}}}
 \HyPL@Entry{30<</P(\376\377\0003\0001)>>}
-\newlabel{fig:orchestration}{{2}{31}{The three safe-by-design orchestration contracts introduced in GNN 3.0.0, side by side inside the dashed boundary that states their shared invariant: generate and validate data only, never mutate live infrastructure. Each column names the contract's source module under \protect \breaktt {src/gnn/pipeline/} and chains its stages top to bottom --- StreamManifest, ExecutionTrace, and replay for durable observation streams; checkpoint, resume, status, and safe cleanup for resumable run sessions; generate, static security review, and rollback for container plans. Arrows give the order the stages run in, and nothing exits the boundary. The panel is a fixed-layout drawing of the three contracts; the acceptance gates and the Model Context Protocol tools that exercise them are described in the text above. Take-away: long-running orchestration gains capability only as fast as it becomes inspectable}{fig:orchestration}{}}
+\newlabel{fig:orchestration}{{2}{31}{The three safe-by-design orchestration contracts introduced in GNN 3.0.0, side by side inside the dashed boundary that states their shared invariant: generate and validate data only, never mutate live infrastructure. Each column names the contract's source module under \protect \breaktt {src/gnn/pipeline/} and chains its stages top to bottom --- StreamManifest, ExecutionTrace, and replay for durable observation streams; checkpoint, resume, status, and safe cleanup for resumable run sessions; generate, static security review, and rollback for container plans. Arrows give the order the stages run in, and nothing exits the boundary. The panel is a fixed-layout drawing of the three contracts; the acceptance gates and the Model Context Protocol tools that exercise them are described in the text above. Take-away: long-running orchestration gains capability only as fast as it becomes inspectable}{Doc-Start}{}}
 \@writefile{snm}{\beamer@slide {fig:orchestration}{31}}
 \@writefile{nav}{\headcommand {\slideentry {1}{5}{4}{31/31}{Long-Running Orchestration Contracts}{0}}}
 \@writefile{nav}{\headcommand {\beamer@framepages {31}{31}}}
