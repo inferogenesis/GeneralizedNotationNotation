@@ -142,6 +142,7 @@ def check_integration_dependencies_mcp() -> Dict[str, Any]:
         ("jax", "JAX"),
         ("torch", "PyTorch"),
         ("numpyro", "NumPyro"),
+        ("cpomdp", "cpomdp"),
     ]:
         try:
             found = importlib.util.find_spec(pkg) is not None

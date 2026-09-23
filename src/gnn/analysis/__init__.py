@@ -16,6 +16,7 @@ FEATURES: dict[str, Any] = {
     "cross_framework_metrics": True,
     "pytorch_analysis": True,
     "numpyro_analysis": True,
+    "cpomdp_analysis": True,
     "mcp_integration": True,
 }
 

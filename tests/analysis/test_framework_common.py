@@ -44,6 +44,7 @@ class TestFrameworkDirNames:
         expected = {
             "activeinference_jl",
             "bnlearn",
+            "cpomdp",
             "discopy",
             "jax",
             "numpyro",

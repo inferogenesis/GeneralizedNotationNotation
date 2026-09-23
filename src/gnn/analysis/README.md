@@ -18,7 +18,7 @@ src/gnn/analysis/
 ├── interpretability.py            # Interpretability summaries
 ├── generate_cross_model_report.py # Cross-model report generation
 ├── mcp.py                         # Model Context Protocol integration
-└── <framework>/analyzer.py        # pymdp, rxinfer, jax, discopy, activeinference_jl, numpyro, pytorch
+└── <framework>/analyzer.py        # pymdp, rxinfer, jax, discopy, activeinference_jl, numpyro, pytorch, cpomdp
 ```
 
 ### Analysis Processing Architecture

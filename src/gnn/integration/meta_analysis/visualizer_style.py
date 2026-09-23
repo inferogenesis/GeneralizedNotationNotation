@@ -58,6 +58,7 @@ _FRAMEWORK_COLORS: dict[str, Any] = {
     "pymdp": "#E63946",  # Vivid Red
     "jax": "#457B9D",  # Deep Blue-Gray
     "numpyro": "#1D3557",  # Navy
+    "cpomdp": "#0B7285",  # Deep Cyan
     "rxinfer": "#2A9D8F",  # Teal/Green
     "activeinference_jl": "#B8860B",  # Dark Goldenrod (visible on white)
     "discopy": "#9B59B6",  # Amethyst

@@ -284,13 +284,18 @@ available to all framework analyzers):
 
 ### `flat_payload_analyzer.py`
 
-Shared analyzer engine for PyTorch/NumPyro flat-payload simulation results.
+Shared analyzer engine for PyTorch/NumPyro/cpomdp flat-payload simulation results.
 Each framework's `analyzer.py` binds a `FlatPayloadSpec` (framework name, file
 patterns, analysis filename, plot labels, bar color) and re-exports
 `generate_analysis_from_logs` / `_generate_plots` — the public call sites
 (processor's importlib discovery, `test_numpyro_pytorch_analyzers.py`) are
-unchanged. Exports: `FlatPayloadSpec`, `compute_flat_payload_metrics` (pure),
-`discover_result_files`, `generate_analysis_from_logs`.
+unchanged. Payloads stamped `model_kind: "continuous"` (cpomdp, and the
+continuous branch of the other Python backends) take the continuous branch:
+`compute_continuous_payload_metrics` (RMSE, epistemic/pragmatic means, no
+categorical entropy on Gaussian means) and an extra `efe_terms.png` panel.
+Exports: `FlatPayloadSpec`, `compute_flat_payload_metrics` (pure),
+`compute_continuous_payload_metrics` (pure), `discover_result_files`,
+`generate_analysis_from_logs`.
 
 ---
 

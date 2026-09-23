@@ -84,6 +84,7 @@ def list_ml_integration_targets_mcp() -> Dict[str, Any]:
         "tensorflow": importlib.util.find_spec("tensorflow") is not None,
         "scikit_learn": importlib.util.find_spec("sklearn") is not None,
         "numpyro": importlib.util.find_spec("numpyro") is not None,
+        "cpomdp": importlib.util.find_spec("cpomdp") is not None,
     }
     available = [t for t, v in targets.items() if v]
     return {

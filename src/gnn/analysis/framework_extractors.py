@@ -2,7 +2,7 @@
 Framework-specific data extractors for post-simulation analysis.
 
 Provides extract_*_data() functions for PyMDP, RxInfer.jl, ActiveInference.jl,
-JAX, DisCoPy, PyTorch, and NumPyro execution results.
+JAX, DisCoPy, PyTorch, NumPyro, and cpomdp execution results.
 
 Extracted from post_simulation.py for maintainability.
 """
@@ -621,6 +621,7 @@ def extract_discopy_data(execution_result: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-# PyTorch and NumPyro use the same result schema as PyMDP.
+# PyTorch, NumPyro and cpomdp use the same result schema as PyMDP.
 extract_pytorch_data = extract_pymdp_data
 extract_numpyro_data = extract_pymdp_data
+extract_cpomdp_data = extract_pymdp_data

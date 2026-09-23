@@ -1,4 +1,4 @@
-"""Tests for the numpyro and pytorch framework analyzers (Step 16).
+"""Tests for the numpyro, pytorch and cpomdp framework analyzers (Step 16).
 
 Covers ``analysis.numpyro.generate_analysis_from_logs`` and
 ``analysis.pytorch.generate_analysis_from_logs`` end-to-end on realistic
@@ -17,7 +17,7 @@ from typing import Any
 
 import pytest
 
-FRAMEWORKS = ["numpyro", "pytorch"]
+FRAMEWORKS = ["numpyro", "pytorch", "cpomdp"]
 
 
 def _read_analyzer(framework: str) -> Any:
@@ -108,6 +108,78 @@ def test_generate_analysis_end_to_end(framework: str, tmp_path: Path) -> None:
         assert (model_out / "belief_trajectory.png").exists()
         assert (model_out / "action_distribution.png").exists()
         assert (model_out / "efe_history.png").exists()
+
+
+def _continuous_payload(
+    model_name: str = "model_c", passive: bool = False
+) -> dict[str, Any]:
+    """A payload shaped like the cpomdp runner writes for a continuous model."""
+    payload: dict[str, Any] = {
+        "model_name": model_name,
+        "framework": "cpomdp",
+        "model_kind": "continuous",
+        "num_timesteps": 3,
+        "num_states": 2,
+        "num_observations": 2,
+        "beliefs": [[0.1, -0.2], [0.4, -0.1], [0.9, 0.0]],
+        "posterior_cov": [[[0.5, 0.0], [0.0, 0.5]]] * 3,
+        "true_states_continuous": [[0.0, 0.0], [0.5, 0.0], [1.0, 0.0]],
+        "observations_continuous": [[0.1, 0.0], [0.5, 0.1], [1.0, -0.1]],
+        "controls": [[0.0, 0.0]] * 3,
+        "control_mode": "passive" if passive else "efe",
+        "rmse_vs_true": 0.123,
+        "observations": [],
+        "actions": [],
+        "validation": {"all_valid": True},
+        "efe_history": []
+        if passive
+        else [[1.0, 0.5, 0.7], [0.8, 0.4, 0.6], [0.6, 0.3, 0.5]],
+        "epistemic_term": [] if passive else [0.9, 0.8, 0.7],
+        "pragmatic_term": [] if passive else [1.4, 1.2, 1.0],
+        "selected_policy_index": [] if passive else [1, 1, 2],
+        "n_policies": 0 if passive else 3,
+    }
+    return payload
+
+
+@pytest.mark.parametrize("passive", [False, True])
+def test_cpomdp_continuous_payload_takes_continuous_branch(
+    tmp_path: Path, passive: bool
+) -> None:
+    """Continuous payloads report RMSE and the EFE split, never categorical entropy."""
+    mod = _read_analyzer("cpomdp")
+    exec_dir = tmp_path / "12_execute_output"
+    _write_results(exec_dir, "cpomdp", _continuous_payload("model_c", passive))
+    out_dir = tmp_path / "16_analysis_output" / "cpomdp"
+    generated = mod.generate_analysis_from_logs(exec_dir, out_dir)
+    assert len(generated) == 1
+    analysis = json.loads(Path(generated[0]).read_text(encoding="utf-8"))
+    assert analysis["framework"] == "cpomdp"
+    assert analysis["model_kind"] == "continuous"
+    assert analysis["num_timesteps"] == 3 and analysis["num_states"] == 2
+    metrics = analysis["metrics"]
+    assert metrics["rmse_vs_true"] == pytest.approx(0.123)
+    assert "mean_belief_entropy" not in metrics and "mean_confidence" not in metrics
+    assert metrics["final_posterior_trace"] == pytest.approx(1.0)
+    if passive:
+        assert metrics["control_mode"] == "passive"
+        assert "mean_efe" not in metrics and "mean_epistemic" not in metrics
+    else:
+        assert metrics["control_mode"] == "efe" and metrics["n_policies"] == 3
+        assert metrics["mean_efe"] == pytest.approx(0.6)
+        assert metrics["mean_epistemic"] == pytest.approx(0.8)
+        assert metrics["mean_pragmatic"] == pytest.approx(1.2)
+        assert metrics["policy_distribution"] == {"1": 2, "2": 1}
+        assert metrics["min_efe_per_step"] == pytest.approx([0.5, 0.4, 0.3])
+    try:
+        import matplotlib  # noqa: F401
+    except ImportError:
+        return
+    model_out = out_dir / "model_a"
+    assert analysis["plots_generated"] is True
+    assert (model_out / "belief_trajectory.png").exists()
+    assert (model_out / "efe_history.png").exists() is (not passive)
+    assert (model_out / "efe_terms.png").exists() is (not passive)
 
 
 @pytest.mark.parametrize("framework", FRAMEWORKS)
