@@ -1,4 +1,4 @@
-"""Continuous (linear-Gaussian) branch of the JAX / NumPyro / PyTorch / Stan renderers.
+"""Continuous (linear-Gaussian) branch of the JAX / NumPyro / PyTorch / Stan / cpomdp renderers.
 
 Builds the continuous ``gnn_spec`` by hand (the shape ``render.pomdp_processor``
 emits for ``model_kind == "continuous"``), renders each backend, and executes
@@ -19,6 +19,7 @@ from typing import Any, Dict, cast
 import pytest
 
 from gnn.render.continuous_common import extract_continuous_spec, is_continuous_spec
+from gnn.render.cpomdp.cpomdp_renderer import UNSUPPORTED_MESSAGE, render_gnn_to_cpomdp
 from gnn.render.jax.jax_renderer import render_gnn_to_jax
 from gnn.render.numpyro.numpyro_renderer import render_gnn_to_numpyro
 from gnn.render.pytorch.pytorch_renderer import render_gnn_to_pytorch
@@ -102,6 +103,43 @@ def test_numpyro_continuous_renders_and_runs_nuts(tmp_path: Path) -> None:
     assert res["validation"]["mcmc_finite"] is True
 
 
+@pytest.mark.needs_cpomdp
+@pytest.mark.parametrize(
+    ("with_control", "control_mode"),
+    [(True, "efe"), (True, "parity"), (False, None)],
+)
+def test_cpomdp_continuous_renders_and_runs(
+    tmp_path: Path, with_control: bool, control_mode: str | None
+) -> None:
+    options = {"control_mode": control_mode} if control_mode else None
+    ok, msg, arts = render_gnn_to_cpomdp(
+        _spec(with_control), tmp_path / "m_cpomdp.py", options
+    )
+    assert ok, msg
+    code = Path(arts[0]).read_text()
+    assert "LinearGaussianModel(" in code and "EnumeratedEfeSearch(" in code
+    res = _run(Path(arts[0]), "CPOMDP_OUTPUT_DIR", tmp_path / "out")
+    _assert_schema(res, "cpomdp", with_control)
+    assert res["control_mode"] == (control_mode or "passive")
+    assert res["validation"]["efe_finite"] is True
+    assert "cpomdp_version" in res and "jax_version" in res
+    if with_control:
+        assert len(res["efe_history"]) == T
+        assert all(len(row) == res["n_policies"] == 9 for row in res["efe_history"])
+        assert len(res["epistemic_term"]) == len(res["pragmatic_term"]) == T
+        assert len(res["selected_policy_index"]) == T
+        assert res["search_warrant"].startswith("PROVED")
+    else:
+        assert res["efe_history"] == [] and res["n_policies"] == 0
+
+
+def test_cpomdp_rejects_bad_options(tmp_path: Path) -> None:
+    ok, msg, arts = render_gnn_to_cpomdp(
+        _spec(True), tmp_path / "bad.py", {"control_mode": "lqr"}
+    )
+    assert not ok and not arts and "control_mode" in msg
+
+
 @pytest.mark.needs_torch
 def test_pytorch_continuous_renders(tmp_path: Path) -> None:
     ok, msg, arts = render_gnn_to_pytorch(_spec(True), tmp_path / "m_pytorch.py")
@@ -152,3 +190,7 @@ def test_discrete_regression_still_renders(tmp_path: Path) -> None:
     ):
         ok, msg, _ = fn(spec, tmp_path / name)
         assert ok, f"{name}: {msg}"
+    # cpomdp is continuous-only: a discrete spec is refused, not rendered.
+    ok, msg, arts = render_gnn_to_cpomdp(spec, tmp_path / "d_cpomdp.py")
+    assert not ok and msg == UNSUPPORTED_MESSAGE and arts == []
+    assert not (tmp_path / "d_cpomdp.py").exists()

@@ -144,6 +144,16 @@ RENDERER_ROUTES: Dict[str, RendererRoute] = {
         result_mode="artifacts",
         artifacts_mode="returned",
     ),
+    "cpomdp": RendererRoute(
+        module=".cpomdp.cpomdp_renderer",
+        function="render_gnn_to_cpomdp",
+        suffix="_cpomdp.py",
+        label="cpomdp",
+        validate=False,
+        options_mode="timesteps",
+        result_mode="artifacts",
+        artifacts_mode="returned",
+    ),
     "stan": RendererRoute(
         module=".stan.stan_renderer",
         function="render_gnn_to_stan",
@@ -446,6 +456,19 @@ class POMDPRenderProcessor:
                     "structural-spec: no renderable form — declares boundary "
                     "structure only (no discrete A/B/C/D[/E] and no "
                     "continuous F/H/Q/R parameterization)"
+                ),
+                "warnings": warnings,
+            }
+
+        # Continuous-only backends (cpomdp) mirror the categorical case: a
+        # discrete POMDP is reported unsupported, never failed.
+        if not config.get("supports_discrete", True):
+            return {
+                "compatible": False,
+                "unsupported": True,
+                "reason": (
+                    f"discrete POMDP: {config.get('name', framework)} renders "
+                    "continuous (linear-Gaussian) models only"
                 ),
                 "warnings": warnings,
             }
