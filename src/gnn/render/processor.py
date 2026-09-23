@@ -954,6 +954,7 @@ The rendered files are organized in implementation-specific subfolders:
 │   ├── discopy/            # DisCoPy categorical diagrams
 │   ├── pytorch/            # PyTorch simulations
 │   ├── numpyro/            # NumPyro simulations
+│   ├── cpomdp/             # cpomdp continuous active inference (continuous models only)
 │   ├── stan/               # Stan models
 │   └── bnlearn/            # Bayesian network scripts
 └── render_processing_summary.json  # Detailed results
@@ -1000,6 +1001,7 @@ def _render_continuous_target(
     targets = {
         "jax": ("jax.jax_renderer", "render_gnn_to_jax", "_jax.py"),
         "numpyro": ("numpyro.numpyro_renderer", "render_gnn_to_numpyro", "_numpyro.py"),
+        "cpomdp": ("cpomdp.cpomdp_renderer", "render_gnn_to_cpomdp", "_cpomdp.py"),
         "pytorch": ("pytorch.pytorch_renderer", "render_gnn_to_pytorch", "_pytorch.py"),
         "rxinfer": ("rxinfer.rxinfer_renderer", "render_gnn_to_rxinfer", "_rxinfer.jl"),
         "stan": ("stan.stan_renderer", "render_gnn_to_stan", "_stan.py"),
@@ -1150,6 +1152,13 @@ def render_gnn_spec(
                 canonical_spec, output_file, options
             )
             return (True, msg, artifacts) if success else (False, msg, [])
+
+        if target_lower == "cpomdp":
+            # Continuous-only backend: a discrete spec is the mirror image of
+            # pymdp facing a continuous one — unsupported, not a crash.
+            from .cpomdp.cpomdp_renderer import UNSUPPORTED_MESSAGE
+
+            return False, UNSUPPORTED_MESSAGE, []
 
         if target_lower in _GENERATOR_TARGETS:
             gen_name, suffix = _GENERATOR_TARGETS[target_lower]

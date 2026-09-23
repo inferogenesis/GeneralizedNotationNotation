@@ -26,6 +26,7 @@ RENDER_CLI_TARGETS = [
     "jax_pomdp",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "stan",
 ]
 
