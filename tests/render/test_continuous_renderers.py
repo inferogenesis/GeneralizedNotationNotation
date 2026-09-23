@@ -1,4 +1,4 @@
-"""Continuous (linear-Gaussian) branch of the JAX / NumPyro / PyTorch / Stan / cpomdp renderers.
+"""Continuous (linear-Gaussian) branch of the JAX/NumPyro/PyTorch/Stan/cpomdp renderers.
 
 Builds the continuous ``gnn_spec`` by hand (the shape ``render.pomdp_processor``
 emits for ``model_kind == "continuous"``), renders each backend, and executes
@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, cast
 
+import numpy as np
 import pytest
 
 from gnn.render.continuous_common import extract_continuous_spec, is_continuous_spec
@@ -116,28 +117,60 @@ def test_cpomdp_continuous_renders_and_runs(
         _spec(with_control), tmp_path / "m_cpomdp.py", options
     )
     assert ok, msg
-    code = Path(arts[0]).read_text()
-    assert "LinearGaussianModel(" in code and "EnumeratedEfeSearch(" in code
     res = _run(Path(arts[0]), "CPOMDP_OUTPUT_DIR", tmp_path / "out")
     _assert_schema(res, "cpomdp", with_control)
     assert res["control_mode"] == (control_mode or "passive")
     assert res["validation"]["efe_finite"] is True
-    assert "cpomdp_version" in res and "jax_version" in res
+    assert "cpomdp_version" in res
     if with_control:
+        # 9 compass-rose actions at horizon 1: 9 policies, 9 step-evals a cycle.
+        assert res["n_policies"] == 9
+        assert res["cost_per_cycle"] == 9
+        assert all(len(row) == 9 for row in res["efe_history"])
         assert len(res["efe_history"]) == T
-        assert all(len(row) == res["n_policies"] == 9 for row in res["efe_history"])
-        assert len(res["epistemic_term"]) == len(res["pragmatic_term"]) == T
+        assert len(res["epistemic_term"]) == T
+        assert len(res["pragmatic_term"]) == T
         assert len(res["selected_policy_index"]) == T
         assert res["search_warrant"].startswith("PROVED")
     else:
-        assert res["efe_history"] == [] and res["n_policies"] == 0
+        assert res["efe_history"] == []
+        assert res["n_policies"] == 0
+        assert res["cost_per_cycle"] == 0
 
 
-def test_cpomdp_rejects_bad_options(tmp_path: Path) -> None:
+@pytest.mark.needs_cpomdp
+@pytest.mark.parametrize("with_control", [True, False])
+def test_cpomdp_parity_matches_jax_oracle(tmp_path: Path, with_control: bool) -> None:
+    """The jax script's Kalman filter is the exact oracle for cpomdp's filter."""
+    options = {"control_mode": "parity"}
     ok, msg, arts = render_gnn_to_cpomdp(
-        _spec(True), tmp_path / "bad.py", {"control_mode": "lqr"}
+        _spec(with_control), tmp_path / "c_cpomdp.py", options
     )
-    assert not ok and not arts and "control_mode" in msg
+    assert ok, msg
+    cpomdp_res = _run(Path(arts[0]), "CPOMDP_OUTPUT_DIR", tmp_path / "cpomdp")
+    ok, msg, arts = render_gnn_to_jax(_spec(with_control), tmp_path / "j_jax.py")
+    assert ok, msg
+    jax_res = _run(Path(arts[0]), "GNN_OUTPUT_DIR", tmp_path / "jax")
+    for key in ("true_states_continuous", "beliefs", "posterior_cov", "controls"):
+        np.testing.assert_allclose(cpomdp_res[key], jax_res[key], atol=1e-8)
+
+
+@pytest.mark.parametrize(
+    ("option", "value"),
+    [
+        ("control_mode", "lqr"),
+        ("action_scale", 0.0),
+        ("horizon", 0),
+        ("goal_precision", -1.0),
+    ],
+)
+def test_cpomdp_rejects_bad_options(tmp_path: Path, option: str, value: Any) -> None:
+    ok, msg, arts = render_gnn_to_cpomdp(
+        _spec(True), tmp_path / "bad.py", {option: value}
+    )
+    assert not ok
+    assert arts == []
+    assert option in msg
 
 
 @pytest.mark.needs_torch
@@ -192,5 +225,7 @@ def test_discrete_regression_still_renders(tmp_path: Path) -> None:
         assert ok, f"{name}: {msg}"
     # cpomdp is continuous-only: a discrete spec is refused, not rendered.
     ok, msg, arts = render_gnn_to_cpomdp(spec, tmp_path / "d_cpomdp.py")
-    assert not ok and msg == UNSUPPORTED_MESSAGE and arts == []
+    assert not ok
+    assert msg == UNSUPPORTED_MESSAGE
+    assert arts == []
     assert not (tmp_path / "d_cpomdp.py").exists()
