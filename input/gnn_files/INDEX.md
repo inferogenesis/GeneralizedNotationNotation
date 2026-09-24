@@ -9,9 +9,9 @@ execute it through the 25-step pipeline. For syntax and file-structure rules see
 **Counts (measured 2026-09-17):** 30 runnable `.md` spec files across 10 task
 folders (`INDEX.md`, `AGENTS.md` and `README.md` are non-spec scaffolds and are
 excluded by `gnn.processing.discovery.is_model_source_path`). 27 are discrete-state
-POMDP/HMM models that render and execute on all nine frameworks; the 3 files
+POMDP/HMM models that render and execute on every framework except cpomdp; the 3 files
 under `continuous/` are continuous-state linear-Gaussian models that render and
-execute on JAX, NumPyro, PyTorch, Stan and RxInfer.jl and are reported as
+execute on JAX, NumPyro, PyTorch, Stan, RxInfer.jl and cpomdp, and are reported as
 `unsupported` (not failed) on the categorical backends PyMDP,
 ActiveInference.jl, DisCoPy and bnlearn. Live counts come from
 `output/11_render_output/render_processing_summary.json`.

@@ -31,7 +31,7 @@
       "label": "fig:pipeline",
       "png_sha256": "c3040b3e67fa8b7b0591c56c8b5afeb5dfecf980dcda381a1674ddb09e6a30c3",
       "source_sha256": {
-        "src/gnn/STEP_INDEX.md": "a16a5fe42cde01c90ed057a067ab5466a498281da23a3c84bf0cf9b91ef660a6"
+        "src/gnn/STEP_INDEX.md": "ee0fb8dd87ca8f9942e52075a23aa35889f96b34bf627b368a7c6e0a26824782"
       }
     },
     {

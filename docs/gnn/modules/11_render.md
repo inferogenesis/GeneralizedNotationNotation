@@ -7,7 +7,7 @@
 
 ## Module Description
 
-This module provides **POMDP-aware code generation** for GNN models. It translates parsed GNN/POMDP specifications into executable simulation code for nine frameworks: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, NumPyro and Stan are always rendered; PyTorch and bnlearn are also rendered but their runtimes are gated on optional installs (`supports_execution` in `src/gnn/render/framework_registry.py`). Continuous (linear-Gaussian) models render on JAX, NumPyro, PyTorch, Stan and RxInfer.jl; PyMDP, ActiveInference.jl, DisCoPy and bnlearn report render status `unsupported` for them.
+This module provides **POMDP-aware code generation** for GNN models. It translates parsed GNN/POMDP specifications into executable simulation code for ten frameworks: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, NumPyro and Stan are always rendered; cpomdp renders continuous models only; PyTorch and bnlearn are also rendered but their runtimes are gated on optional installs (`supports_execution` in `src/gnn/render/framework_registry.py`). Continuous (linear-Gaussian) models render on JAX, NumPyro, PyTorch, Stan, RxInfer.jl and cpomdp; PyMDP, ActiveInference.jl, DisCoPy and bnlearn report render status `unsupported` for them.
 
 
 - **POMDP state space extraction**: extracts Active Inference matrices (A, B, C, D, E) and dimensions from GNN specs.
@@ -95,7 +95,7 @@ The canonical renderer (`rxinfer_renderer.py`) then dispatches to a per-kind str
 
 **Conventions baked into generated scripts.** `B` is ordered `(next_state, previous_state, action)` — the scripts embed `const B_TENSOR_ORDER = "next_state_previous_state_action"`. In the results payload, `true_states[t]` is the state that *emitted* observation `t`, so it is timing-aligned with `beliefs[t]`.
 
-Continuous exemplars (`input/gnn_files/continuous/`) are **pure linear-Gaussian models** — `F`/`H`/`Q`/`R`, `prior_mean`/`prior_cov`, optional closed-loop `goal_mean`/`control_gain` — with no discrete stand-in. `detect_model_kind` routes them as `CONTINUOUS`: RxInfer.jl (native LGSSM strategy), JAX, NumPyro, PyTorch (shared Kalman-filter generator in `render/continuous_script.py`) and Stan (Kalman marginal-likelihood program) render and execute them; PyMDP, ActiveInference.jl, DisCoPy and bnlearn return the render status `unsupported` (counted separately from failures, never executed). Continuous results echo `state_factors` and `observation_modalities` as empty because a linear-Gaussian model has no categorical factors.
+Continuous exemplars (`input/gnn_files/continuous/`) are **pure linear-Gaussian models** — `F`/`H`/`Q`/`R`, `prior_mean`/`prior_cov`, optional closed-loop `goal_mean`/`control_gain` — with no discrete stand-in. `detect_model_kind` routes them as `CONTINUOUS`: RxInfer.jl (native LGSSM strategy), JAX, NumPyro, PyTorch (shared Kalman-filter generator in `render/continuous_script.py`) Stan (Kalman marginal-likelihood program) and cpomdp (Kalman filter plus expected-free-energy policy search) render and execute them; PyMDP, ActiveInference.jl, DisCoPy and bnlearn return the render status `unsupported` (counted separately from failures, never executed). Continuous results echo `state_factors` and `observation_modalities` as empty because a linear-Gaussian model has no categorical factors.
 
 #### ActiveInference.jl (Julia)
 - **Purpose**: Active Inference framework implementation
