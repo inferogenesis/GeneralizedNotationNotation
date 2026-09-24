@@ -1172,7 +1172,7 @@ Explore practical GNN implementations and use cases:
 | Example | Description | Location |
 |---------|-------------|----------|
 | **🎯 PyMDP POMDP Agent** | Complete POMDP implementation | [`src/gnn/gnn_examples/actinf_pomdp_agent.md`](src/gnn/gnn_examples/actinf_pomdp_agent.md) |
-| **🧭 Continuous Navigation** | Continuous-state linear-Gaussian model with closed-loop control (`F/H/Q/R`, `goal_mean/control_gain`); runs on JAX, NumPyro, PyTorch, Stan and RxInfer.jl | [`input/gnn_files/continuous/continuous_navigation.md`](input/gnn_files/continuous/continuous_navigation.md) |
+| **🧭 Continuous Navigation** | Continuous-state linear-Gaussian model with closed-loop control (`F/H/Q/R`, `goal_mean/control_gain`); runs on JAX, NumPyro, PyTorch, Stan, RxInfer.jl and cpomdp | [`input/gnn_files/continuous/continuous_navigation.md`](input/gnn_files/continuous/continuous_navigation.md) |
 | **🔬 RxInfer Hidden Markov Model** | Probabilistic sequence modeling | [`docs/other/rxinfer_hidden_markov_model.md`](docs/other/rxinfer_hidden_markov_model.md) |
 | **🧠 ActiveInference.jl Examples** | Julia-based Active Inference models | [`docs/activeinference_jl/actinf_jl_src/`](docs/activeinference_jl/actinf_jl_src/) |
 | **🤝 Multi-Agent System** | Collaborative agent modeling | [`docs/other/rxinfer_multiagent_gnn.md`](docs/other/rxinfer_multiagent_gnn.md) |
