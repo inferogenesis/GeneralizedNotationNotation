@@ -27,6 +27,7 @@ VISUALIZATION_FRAMEWORK_DIRS = {
     "discopy",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "bnlearn",
 }
 
