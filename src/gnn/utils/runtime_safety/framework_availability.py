@@ -32,6 +32,7 @@ __all__: list[Any] = [
 FRAMEWORK_IMPORT_CHECK: Dict[str, Tuple[str, str]] = {
     "jax": ("jax", "uv sync"),
     "numpyro": ("numpyro", "uv sync"),
+    "cpomdp": ("cpomdp", "uv sync --extra cpomdp"),
     "pytorch": ("torch", "uv sync"),
     "stan": ("cmdstanpy", "uv sync --extra stan"),
     "discopy": ("discopy", "uv sync"),

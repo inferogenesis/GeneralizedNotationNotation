@@ -35,6 +35,7 @@ FrameworkName = Literal[
     "activeinference_jl",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "stan",
     "lean",
     "bnlearn",

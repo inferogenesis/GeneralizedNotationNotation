@@ -42,6 +42,7 @@ KNOWN_FRAMEWORKS = (
     "activeinference_jl",
     "pytorch",
     "numpyro",
+    "cpomdp",
     "bnlearn",
 )
 

@@ -938,6 +938,7 @@ def _build_execution_environment(
     output_env_vars = {
         "jax": "GNN_OUTPUT_DIR",
         "numpyro": "NUMPYRO_OUTPUT_DIR",
+        "cpomdp": "CPOMDP_OUTPUT_DIR",
         "pytorch": "PYTORCH_OUTPUT_DIR",
         "stan": "STAN_OUTPUT_DIR",
         "bnlearn": "BNLEARN_OUTPUT_DIR",
