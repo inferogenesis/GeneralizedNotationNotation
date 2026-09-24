@@ -85,6 +85,7 @@ def parse_frameworks_parameter(frameworks: str, logger: Any) -> List[str]:
             "activeinference_jl",
             "pytorch",
             "numpyro",
+            "cpomdp",
             "stan",
             "bnlearn",
         ]
@@ -102,6 +103,7 @@ def parse_frameworks_parameter(frameworks: str, logger: Any) -> List[str]:
         "activeinference_jl",
         "pytorch",
         "numpyro",
+        "cpomdp",
         "stan",
         "bnlearn",
     ]
@@ -242,6 +244,7 @@ def find_executable_scripts(
         "activeinference.jl": "activeinference_jl",
         "pytorch": "pytorch",
         "numpyro": "numpyro",
+        "cpomdp": "cpomdp",
         "stan": "stan",
         "bnlearn": "bnlearn",
     }
