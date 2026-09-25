@@ -19,14 +19,15 @@ This module is responsible for running GNN models that have been rendered into f
 | **DisCoPy** | Python | `discopy/` | `*_discopy.py` | ✅ Full support |
 | **PyTorch** | Python | `pytorch/` | `*_pytorch.py` | ✅ Full support |
 | **NumPyro** | Python | `numpyro/` | `*_numpyro.py` | ✅ Full support |
+| **cpomdp** | Python | `cpomdp/` | `*_cpomdp.py` | ✅ (continuous models; skipped without `uv sync --extra cpomdp`) |
 | **Stan** | Python driver (cmdstanpy) | `stan/` | `*_stan.py` | ✅ (skipped when cmdstanpy/CmdStan absent) |
 | **bnlearn** | Python | `bnlearn/` | `*_bnlearn.py` | ✅ Full support |
 
-JAX, NumPyro and DisCoPy are **core** dependencies (`uv sync`); PyTorch needs the `torch` extra (`uv sync --extra torch`; torch>=2.13.0 resolves GHSA-rrmf-rvhw-rf47), bnlearn stays manual, and Stan needs `uv sync --extra stan` plus a CmdStan toolchain. If the environment is incomplete, the affected scripts are **skipped** (not failed). Julia frameworks require Julia installed.
+JAX, NumPyro and DisCoPy are **core** dependencies (`uv sync`); PyTorch needs the `torch` extra (`uv sync --extra torch`; torch>=2.13.0 resolves GHSA-rrmf-rvhw-rf47), bnlearn stays manual, Stan needs `uv sync --extra stan` plus a CmdStan toolchain, and cpomdp needs `uv sync --extra cpomdp` (runs longer than 60 steps also need `CPOMDP_ALLOW_LONG=1`). If the environment is incomplete, the affected scripts are **skipped** (not failed). Julia frameworks require Julia installed.
 
 Two behaviours introduced in v3.2.0: `_merge_prior_execution_summary` (`src/gnn/execute/processor.py`) folds a previously written `execution_summary.json` into the current results so the durable summary covers every input folder rather than the last one processed; and script discovery only considers `.py`/`.jl` files, so companion artifacts such as `<stem>_stan.stan` and `<stem>_stan_data.json` are never treated as executables.
 
-Continuous (linear-Gaussian) models reach Step 12 only for the backends that render them (JAX, NumPyro, PyTorch, Stan, RxInfer.jl); the categorical backends report render status `unsupported` in Step 11 and emit nothing to execute.
+Continuous (linear-Gaussian) models reach Step 12 only for the backends that render them (JAX, NumPyro, PyTorch, Stan, RxInfer.jl, cpomdp); the categorical backends report render status `unsupported` in Step 11 and emit nothing to execute. cpomdp is the converse: discrete models never reach it.
 
 ## Agent Identity & Capabilities
 
@@ -34,7 +35,7 @@ Continuous (linear-Gaussian) models reach Step 12 only for the backends that ren
 
 ## Module Overview
 
-**Purpose**: Execute rendered simulation scripts across multiple frameworks (PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan, bnlearn).
+**Purpose**: Execute rendered simulation scripts across multiple frameworks (PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan).
 
 **Pipeline Step**: Step 12: Execution (12_execute.py)
 
@@ -109,7 +110,7 @@ Rendered RxInfer scripts end with `return results["validation"]["all_valid"] ? 0
 - `verbose` (bool): Enable verbose logging (default: False)
 - `logger` (Optional[logging.Logger]): Logger instance (default: None)
 - `frameworks` (str): Frameworks to execute ("all", "lite", or comma-separated list, default: "all")
-  - `"all"`: PyMDP, JAX, DisCoPy, RxInfer.jl, ActiveInference.jl, PyTorch, NumPyro, Stan, bnlearn
+  - `"all"`: PyMDP, JAX, DisCoPy, RxInfer.jl, ActiveInference.jl, PyTorch, NumPyro, cpomdp, Stan, bnlearn
   - `"lite"`: the Python-only subset — PyMDP, JAX, DisCoPy, bnlearn (no Julia)
   - Comma-separated: `"pymdp,jax"` for specific frameworks; names outside the valid set are filtered out
 - `simulation_engine` (str): Engine to use ("auto", "pymdp", "rxinfer", etc., default: "auto")

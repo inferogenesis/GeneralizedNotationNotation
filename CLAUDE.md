@@ -35,7 +35,7 @@ just                         # List all recipes
 just test                    # Fast test suite
 just lint                    # Ruff lint
 just pipeline                # Full pipeline
-just render-health           # Check all 9 renderer backends
+just render-health           # Check all 10 renderer backends
 just test-mod render         # Test a specific module
 just steps                   # List all 25 pipeline steps from step registry
 just bench                   # Run performance benchmarks
@@ -116,6 +116,7 @@ Code generation and execution support multiple backends:
 - **DisCoPy** (Python): `render/discopy/`, `execute/discopy/`
 - **PyTorch** (Python): `render/pytorch/`, `execute/pytorch/`
 - **NumPyro** (Python): `render/numpyro/`, `execute/numpyro/`
+- **cpomdp** (Python): `render/cpomdp/`, `execute/cpomdp/` — continuous models only; optional `cpomdp` extra
 - **Stan** (Stan + cmdstanpy driver): `render/stan/`, `execute/stan/` — HMM forward-algorithm program for discrete models, Kalman marginal likelihood for continuous ones; `uv sync --extra stan` plus a CmdStan toolchain to execute
 
 ```bash
@@ -125,11 +126,11 @@ python src/gnn/12_execute.py --frameworks "pymdp,jax" --verbose
 
 ### Model kinds and framework support
 
-Discrete-state POMDP/HMM exemplars (categorical `A/B/C/D`) render and execute on all nine frameworks. Continuous-state exemplars (`input/gnn_files/continuous/`, linear-Gaussian `F/H/Q/R` + Gaussian prior, optional closed-loop `goal_mean`/`control_gain`) render and execute natively on JAX, NumPyro, PyTorch, Stan and RxInfer.jl via a Kalman filter (NumPyro and Stan also run NUTS on the same model). PyMDP, ActiveInference.jl, DisCoPy and bnlearn are categorical and report continuous models with the render status **`unsupported`** — a distinct outcome from `failed` (excluded from success rates; Step 12 never executes them). The shared generator is `render/continuous_script.py`; `render/framework_registry.py` carries `supports_continuous` per framework.
+Discrete-state POMDP/HMM exemplars (categorical `A/B/C/D`) render and execute on all nine frameworks. Continuous-state exemplars (`input/gnn_files/continuous/`, linear-Gaussian `F/H/Q/R` + Gaussian prior, optional closed-loop `goal_mean`/`control_gain`) render and execute natively on JAX, NumPyro, PyTorch, Stan and RxInfer.jl via a Kalman filter (NumPyro and Stan also run NUTS on the same model), and on cpomdp (`uv sync --extra cpomdp`; exact Kalman filter plus enumerated expected-free-energy control — the continuous-only backend, which reports discrete models `unsupported`). PyMDP, ActiveInference.jl, DisCoPy and bnlearn are categorical and report continuous models with the render status **`unsupported`** — a distinct outcome from `failed` (excluded from success rates; Step 12 never executes them). The shared generator is `render/continuous_script.py` (cpomdp has its own in `render/cpomdp/script_template.py`); `render/framework_registry.py` carries `supports_continuous` and `supports_discrete` per framework.
 
 ### Running all execution frameworks
 
-Step 12 (Execute) runs scripts for every framework (PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan). JAX, NumPyro, PyMDP, and DisCoPy are **core** Python dependencies: a normal ``uv sync`` installs them. If the environment is incomplete, those backends are **skipped** at step 12 (not failed) with a dependency reason. PyTorch is supported by the renderer/executor but is intentionally not locked as a default dependency (see `pyproject.toml`); install `torch` manually when you need that backend. Stan needs `uv sync --extra stan` and `python -c "import cmdstanpy; cmdstanpy.install_cmdstan()"`. Julia backends require a local Julia install (Julia 1.12 works; `src/gnn/execute/activeinference_jl/Project.toml` pins `Distributions < 0.25.126` because DistributionsAD 0.6.58 does not precompile against newer releases). Step 12 merges its `execution_summary.json` across per-folder invocations, so the durable summary covers every input folder.
+Step 12 (Execute) runs scripts for every framework (PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan). JAX, NumPyro, PyMDP, and DisCoPy are **core** Python dependencies: a normal ``uv sync`` installs them. If the environment is incomplete, those backends are **skipped** at step 12 (not failed) with a dependency reason. PyTorch is supported by the renderer/executor but is intentionally not locked as a default dependency (see `pyproject.toml`); install `torch` manually when you need that backend. Stan needs `uv sync --extra stan` and `python -c "import cmdstanpy; cmdstanpy.install_cmdstan()"`. Julia backends require a local Julia install (Julia 1.12 works; `src/gnn/execute/activeinference_jl/Project.toml` pins `Distributions < 0.25.126` because DistributionsAD 0.6.58 does not precompile against newer releases). Step 12 merges its `execution_summary.json` across per-folder invocations, so the durable summary covers every input folder.
 
 ## Key Locations
 
@@ -196,6 +197,7 @@ uv sync --extra gui                  # GUI interfaces (gradio, streamlit)
 uv sync --extra graphs               # System Graphviz bindings
 uv sync --extra research             # Notebooks / scientific computing for non-developer users
 uv sync --extra scaling              # Distributed execution (dask, distributed, ray)
+uv sync --extra cpomdp               # cpomdp continuous active inference backend (Step 12)
 uv sync --all-extras                 # Everything
 ```
 

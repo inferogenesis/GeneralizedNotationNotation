@@ -79,6 +79,12 @@
 - **Output**: Python scripts under `numpyro/` when the renderer is available
 - **Continuous models**: native (linear-Gaussian programs)
 
+#### cpomdp (Python)
+- **Purpose**: Continuous active inference backend — exact Kalman filtering plus an exhaustive expected-free-energy search over a declared finite action set
+- **Output**: Python scripts under `cpomdp/` (`<model>_cpomdp.py`); the emitted script imports the `cpomdp` PyPI package (`uv sync --extra cpomdp`)
+- **Continuous models**: native (own template in `render/cpomdp/script_template.py`; `control_mode` `efe` or `parity`)
+- **Discrete models**: `unsupported` (continuous-only backend; `supports_discrete: False` in the registry)
+
 #### Stan (Stan)
 - **Purpose**: Probabilistic programming model backend
 - **Output**: Stan models plus cmdstanpy drivers under `stan/` when requested
@@ -357,7 +363,7 @@ uv run python src/gnn/main.py \
   - `activeinference_jl/<model_name>_activeinference.jl`
   - `jax/<model_name>_jax.py`
   - `discopy/<model_name>_discopy.py`
-  - optional/requested backends: `pytorch/`, `numpyro/`, `stan/`, `bnlearn/`
+  - optional/requested backends: `pytorch/`, `numpyro/`, `cpomdp/` (continuous models only), `stan/`, `bnlearn/`
 - `render_processing_summary.json` - Processing summary
 
 ### Output Directory Structure
@@ -372,6 +378,7 @@ output/11_render_output/
     ├── discopy/
     ├── pytorch/        # if requested and available
     ├── numpyro/        # if requested and available
+    ├── cpomdp/         # if requested; continuous models only
     ├── stan/           # if requested and available
     └── bnlearn/        # if requested and available
 ```

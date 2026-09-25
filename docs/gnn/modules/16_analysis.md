@@ -23,7 +23,7 @@ src/gnn/analysis/
 ├── generate_cross_model_report.py # Cross-model reporting
 ├── mcp.py                         # Model Context Protocol integration
 └── <framework>/                   # Per-framework analyzers: rxinfer, pymdp,
-                                   # activeinference_jl, jax, discopy, numpyro, pytorch
+                                   # activeinference_jl, jax, discopy, numpyro, pytorch, cpomdp
 ```
 
 The RxInfer analyzer (`src/gnn/analysis/rxinfer/`) is the deepest of these and is documented in [RxInfer Analysis](#rxinfer-analysis) below.

@@ -8,6 +8,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/) and [Semantic Ver
 
 ## [Unreleased]
 
+### Added (2026-09-25 — cpomdp continuous active inference backend)
+
+- **cpomdp render/execute/analysis backend.** A tenth render target,
+  `cpomdp` (`src/gnn/render/cpomdp/`), renders continuous (linear-Gaussian)
+  GNN models to standalone programs built on the `cpomdp` PyPI package:
+  exact Kalman filtering plus an exhaustive expected-free-energy search over
+  a declared compass-rose action set (`control_mode="efe"`), or GNN's
+  proportional controller on cpomdp's filter (`control_mode="parity"`, which
+  reproduces the `jax` backend bit-for-bit on the same seed). Discrete
+  POMDPs report the render status `unsupported` through the new
+  `supports_discrete` registry field — the mirror of pymdp facing a
+  continuous model. Step 12 runs the scripts through `execute/cpomdp/`
+  (60-step cap without `CPOMDP_ALLOW_LONG=1`, skipped when the extra is
+  missing) and Step 16 analyses them through `analysis/cpomdp/`; the shared
+  flat-payload analyzer gained a continuous branch (RMSE, epistemic/pragmatic
+  means, per-policy EFE panel) for `model_kind: "continuous"` payloads.
+  Result JSON is a superset of the continuous schema (`efe_history`,
+  `epistemic_term`, `pragmatic_term`, `selected_policy_index`,
+  `search_warrant`, `sensor_kind`, `R_x_family`).
+- **`cpomdp` optional extra** (`uv sync --extra cpomdp`; `cpomdp>=0.4.4,<0.5`,
+  MIT). Resolves inside the existing jax window with no version moves; the
+  dependency window and licence check are recorded in
+  `docs/gnn/implementations/cpomdp.md`.
+- Tests: continuous renderer schema (efe/parity/passive), discrete refusal,
+  registry and dispatch guards, output contract, runner cap and routing, a
+  render-and-execute pass over the continuous exemplars, analyzer continuous
+  branch, and the slow jax parity test (`needs_cpomdp` toolchain marker).
+
 ### Changed (2026-09-15 — SCOPE-2026-09-15 execution wave)
 
 - **N-1 + N-6 + N-7 (`d79c62756`).** `resolve_step_output_dir` now carries a

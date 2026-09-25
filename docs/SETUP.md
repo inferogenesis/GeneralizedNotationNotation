@@ -125,6 +125,7 @@ than pretending that every target is installed.
 | PyMDP | Python | Core | Render + execute |
 | JAX | Python | Core | Render + execute |
 | NumPyro | Python | Core | Render + execute |
+| cpomdp | Python | Optional extra (`uv sync --extra cpomdp`) | Render + execute (continuous models only) |
 | DisCoPy | Python | Core | Render + execute |
 | RxInfer.jl | Julia | Committed project environment | Render + execute |
 | ActiveInference.jl | Julia | Committed project environment | Render + execute |

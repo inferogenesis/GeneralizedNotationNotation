@@ -34,6 +34,7 @@ These groups match `[project.optional-dependencies]` in `pyproject.toml`:
 | Core `uv sync` | pymdp, jax, numpyro, discopy, LLM clients, visualization | Standard pipeline runtime |
 | `audio` | librosa, soundfile, pedalboard | Audio generation |
 | `gui` | gradio, streamlit | GUI interface |
+| `cpomdp` | cpomdp | Continuous active inference backend for Step 12 |
 | `ml-ai` | transformers, scipy, scikit-learn | Machine learning extensions |
 | Manual install | torch, bnlearn | Optional backends excluded from the lock while Torch has no patched advisory release |
 | `graphs` | graphviz | Graphviz bindings |

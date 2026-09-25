@@ -1,6 +1,6 @@
 ---
 name: gnn-code-generation
-description: GNN code generation for simulation frameworks. Use when generating PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan, or bnlearn code from GNN model specifications.
+description: GNN code generation for simulation frameworks. Use when generating PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan, or bnlearn code from GNN model specifications.
 ---
 
 # GNN Code Generation / Render (Step 11)
@@ -30,6 +30,7 @@ python src/gnn/main.py --only-steps 11 --verbose
 | **DisCoPy** | Python | `render/discopy/` | `.py` scripts |
 | **PyTorch** | Python | `render/pytorch/` | `.py` scripts |
 | **NumPyro** | Python | `render/numpyro/` | `.py` scripts |
+| **cpomdp** | Python | `render/cpomdp/` | `.py` scripts (continuous models only) |
 | **Stan** | Stan | `render/stan/` | `.stan` models |
 | **bnlearn** | Python | generator-backed | `.py` scripts |
 
@@ -91,7 +92,7 @@ uv sync --extra graphs
 ## Output
 
 - Generated scripts in `output/11_render_output/`
-- Per-framework subdirectories: `pymdp/`, `rxinfer/`, `activeinference_jl/`, `jax/`, `discopy/`, `pytorch/`, `numpyro/`, `stan/`, `bnlearn/`
+- Per-framework subdirectories: `pymdp/`, `rxinfer/`, `activeinference_jl/`, `jax/`, `discopy/`, `pytorch/`, `numpyro/`, `cpomdp/`, `stan/`, `bnlearn/`
 - One script per model per framework
 - Render overview documentation
 

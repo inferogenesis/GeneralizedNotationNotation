@@ -186,7 +186,7 @@ The pipeline consists of the following steps (0-24):
 ### Simulation & Analysis (Steps 10-16)
 
 - **Step 10**: Active Inference ontology processing
-- **Step 11**: Code rendering for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, Stan, bnlearn (9 backends)
+- **Step 11**: Code rendering for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, cpomdp, Stan, bnlearn (10 backends)
 - **Step 12**: Execution of rendered simulation scripts
 - **Step 13**: Neurosymbolic LLM Context Analysis and LLM execution guidance
 - **Step 14**: Machine learning integration
@@ -265,6 +265,7 @@ For more detailed information about specific aspects of GNN, refer to:
 - **[DisCoPy Integration](../discopy/gnn_discopy.md)**: Categorical string diagrams and monoidal structures
 - **[PyTorch Integration](implementations/pytorch.md)**: Neural active inference and deep learning
 - **[NumPyro Integration](implementations/numpyro.md)**: Continuous probabilistic programming via MCMC
+- **[cpomdp Integration](implementations/cpomdp.md)**: Continuous active inference with enumerated expected-free-energy control
 - **[JAX Integration](implementations/jax.md)**: High-performance vector-space compilation
 - **[ActiveInference.jl](implementations/activeinference_jl.md)**: Discrete-state Julia POMDP simulation
 

@@ -12,14 +12,15 @@ Multi-framework rendering and code generation from GNN models.
 - `rxinfer/rxinfer_renderer.py` - Canonical RxInfer.jl renderer (genuine `@model` + `infer()`); the retired `toml_generator.py` emitter was deleted and its live helpers moved to `rxinfer/model_contracts.py` (the `rxinfer_toml` target is no longer supported)
 - `stan/stan_renderer.py` - Stan program + cmdstanpy driver generation
 - `pytorch/pytorch_renderer.py`, `numpyro/numpyro_renderer.py` - generator-backed continuous backends
+- `cpomdp/cpomdp_renderer.py` + `cpomdp/script_template.py` - continuous-only cpomdp backend (Kalman + enumerated EFE search)
 
 ### Core
 - `generators.py` - Code generator utilities
 - `processor.py` - Step 11 entry point
-- `framework_registry.py` - Canonical framework inventory (`supports_continuous`, availability)
+- `framework_registry.py` - Canonical framework inventory (`supports_continuous`, `supports_discrete`, availability)
 
 ## Supported Frameworks
-- `pymdp`, `rxinfer`, `activeinference_jl`, `jax`, `discopy`, `pytorch`, `numpyro`, `stan`, and `bnlearn`.
+- `pymdp`, `rxinfer`, `activeinference_jl`, `jax`, `discopy`, `pytorch`, `numpyro`, `cpomdp`, `stan`, and `bnlearn`.
 
 ## Key Exports
 ```python

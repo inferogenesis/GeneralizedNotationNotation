@@ -117,7 +117,7 @@ GNN files are processed through a comprehensive 25-step pipeline orchestrated by
 
 ### Rendering and Execution (Steps 11, 12)
 
-- `11_render.py`: Code generation for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, Stan, bnlearn (9 backends)
+- `11_render.py`: Code generation for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, cpomdp, Stan, bnlearn (10 backends)
 - `12_execute.py`: Execution of rendered simulation scripts
 
 ### Analysis and Reporting (Steps 13, 16, 23, 24)
@@ -347,6 +347,7 @@ By providing a rigorous yet flexible notation, GNN fosters reproducible, accessi
 - **[DisCoPy Integration](../discopy/gnn_discopy.md)**: Categorical string diagrams and monoidal structures
 - **[PyTorch Integration](implementations/pytorch.md)**: Neural active inference and deep learning
 - **[NumPyro Integration](implementations/numpyro.md)**: Continuous probabilistic programming via MCMC
+- **[cpomdp Integration](implementations/cpomdp.md)**: Continuous active inference with enumerated expected-free-energy control
 - **[JAX Integration](implementations/jax.md)**: High-performance vector-space compilation
 - **[ActiveInference.jl](implementations/activeinference_jl.md)**: Discrete-state Julia POMDP simulation
 - **[Stan Integration](implementations/stan.md)**: Statistical modeling and probabilistic programming

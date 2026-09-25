@@ -1,6 +1,6 @@
 # POMDP-Aware Render Module
 
-This module provides **POMDP-aware code generation** for GNN models. It translates parsed GNN/POMDP specifications into executable simulation code for multiple frameworks including PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan, and bnlearn.
+This module provides **POMDP-aware code generation** for GNN models. It translates parsed GNN/POMDP specifications into executable simulation code for multiple frameworks including PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan, and bnlearn.
 
 ## Key Features
 
@@ -185,6 +185,9 @@ src/gnn/render/
 │   └── pytorch_renderer.py       # PyTorch renderer
 ├── numpyro/                       # NumPyro code generation
 │   └── numpyro_renderer.py       # NumPyro renderer
+├── cpomdp/                        # cpomdp continuous active inference (continuous models only)
+│   ├── cpomdp_renderer.py        # cpomdp renderer
+│   └── script_template.py        # Emitted-script template (Kalman + enumerated EFE search)
 ├── stan/                          # Stan code generation
 │   └── stan_renderer.py          # Stan renderer (program + cmdstanpy driver)
 └── discopy/                       # DisCoPy code generation
@@ -199,7 +202,7 @@ src/gnn/render/
 
 - Core: `process_render`, `render_gnn_spec`, `get_available_renderers`, `get_module_info`
 - Generators: `generate_pymdp_code`, `generate_rxinfer_code`, `generate_activeinference_jl_code`, `generate_discopy_code`
-- Per-framework renders: `render_gnn_to_pymdp`, `render_gnn_to_rxinfer`, `render_gnn_to_discopy`, `render_gnn_to_activeinference_jl`, `render_gnn_to_pytorch`, `render_gnn_to_numpyro`, `render_stan`
+- Per-framework renders: `render_gnn_to_pymdp`, `render_gnn_to_rxinfer`, `render_gnn_to_discopy`, `render_gnn_to_activeinference_jl`, `render_gnn_to_pytorch`, `render_gnn_to_numpyro`, `render_gnn_to_cpomdp`, `render_stan`
 - Renderer classes: `PyMDPRenderer`, `JAXRenderer`
 - POMDP processing: `POMDPRenderProcessor`, `process_pomdp_for_frameworks`
 - Utilities: `get_supported_frameworks`, `validate_render`
@@ -226,7 +229,7 @@ Backend-specific renderers live under:
 - `src/gnn/render/activeinference_jl/`
 - `src/gnn/render/jax/`
 - `src/gnn/render/discopy/`
-- additional maintained backends: `src/gnn/render/pytorch/`, `src/gnn/render/numpyro/`, `src/gnn/render/stan/` (runnable HMM / LGSSM programs plus cmdstanpy drivers), and generator-backed `bnlearn` (render-only; no Step 12 executor)
+- additional maintained backends: `src/gnn/render/pytorch/`, `src/gnn/render/numpyro/`, `src/gnn/render/cpomdp/` (continuous models only; enumerated expected-free-energy control), `src/gnn/render/stan/` (runnable HMM / LGSSM programs plus cmdstanpy drivers), and generator-backed `bnlearn` (render-only; no Step 12 executor)
 
 ### Model kinds
 
@@ -236,11 +239,14 @@ Backend-specific renderers live under:
 `prior_mean/prior_cov`, optional `goal_mean/control_gain`) bypass
 canonicalisation: `render/continuous_common.py` validates the block and
 `render/continuous_script.py` generates the JAX / NumPyro / PyTorch Kalman-filter
-scripts; Stan and RxInfer.jl have their own continuous programs. Frameworks
+scripts; Stan, RxInfer.jl and cpomdp have their own continuous programs
+(cpomdp's in `render/cpomdp/script_template.py`). Frameworks
 whose registry entry has `supports_continuous: false` (PyMDP,
 ActiveInference.jl, DisCoPy, bnlearn) return `{"unsupported": true, "status":
 "unsupported"}` for continuous models — counted under
-`unsupported_framework_renderings`, never as failures, never executed.
+`unsupported_framework_renderings`, never as failures, never executed. The
+continuous-only cpomdp backend (`supports_discrete: false`) reports discrete
+POMDPs the same way.
 
 `STRUCTURAL` specs (issue #111) declare boundary structure only — a
 Markov-blanket wrapper with neither discrete `A/B/C/D[/E]` nor continuous

@@ -125,7 +125,17 @@ with `uv sync --extra <group>` or together with `uv sync --all-extras`):
   previously kept torch out of the default lock.
 - **Installation**: `uv sync --extra torch`
 
-### 11. **all** - Everything
+### 11. **cpomdp** - Continuous Active Inference Backend
+
+- **Packages**: `cpomdp` (>= 0.4.4, < 0.5; MIT)
+- **Use case**: Step 11 rendering and Step 12 execution of the cpomdp
+  backend — exact Kalman filtering plus enumerated expected-free-energy
+  control for the continuous (linear-Gaussian) exemplars. Discrete models
+  report `unsupported` for this target. Rendering never imports the package;
+  without the extra Step 12 reports cpomdp scripts as `skipped`.
+- **Installation**: `uv sync --extra cpomdp`
+
+### 12. **all** - Everything
 
 - **Packages**: union of every group above
 - **Installation**: `uv sync --all-extras`

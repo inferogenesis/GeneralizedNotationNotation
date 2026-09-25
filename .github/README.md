@@ -127,6 +127,7 @@ Code generation and execution are organized under [src/gnn/render/](../src/gnn/r
 | RxInfer | [rxinfer.md](../docs/gnn/implementations/rxinfer.md), [docs/rxinfer/gnn_rxinfer.md](../docs/rxinfer/gnn_rxinfer.md) |
 | ActiveInference.jl | [activeinference_jl.md](../docs/gnn/implementations/activeinference_jl.md), [activeinference-jl.md](../docs/activeinference_jl/activeinference-jl.md) |
 | NumPyro | [numpyro.md](../docs/gnn/implementations/numpyro.md) |
+| cpomdp | [cpomdp.md](../docs/gnn/implementations/cpomdp.md) |
 | PyTorch | [pytorch.md](../docs/gnn/implementations/pytorch.md) |
 | DisCoPy | [discopy.md](../docs/gnn/implementations/discopy.md), [docs/discopy/gnn_discopy.md](../docs/discopy/gnn_discopy.md) |
 | Stan | [stan.md](../docs/gnn/implementations/stan.md) |

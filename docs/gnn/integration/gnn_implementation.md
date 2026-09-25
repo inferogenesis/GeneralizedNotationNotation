@@ -15,8 +15,8 @@ GNN models are implemented through the processing pipeline's code generation and
 
 - **`src/gnn/11_render.py`** → Generate executable code for multiple frameworks
   - See: **[src/gnn/render/AGENTS.md](../../../src/gnn/render/AGENTS.md)** for rendering details
-  - Supports nine backends: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy,
-    PyTorch, NumPyro, Stan, bnlearn
+  - Supports ten backends: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy,
+    PyTorch, NumPyro, cpomdp, Stan, bnlearn
 
 **Execution (Step 12)**
 
@@ -57,6 +57,7 @@ flowchart TD
     RENDER --> DISCOPY[DisCoPy .py]
     RENDER --> TORCH[PyTorch .py]
     RENDER --> NUMPYRO[NumPyro .py]
+    RENDER --> CPOMDP[cpomdp .py]
     RENDER --> STAN[Stan .stan]
     RENDER --> BNLEARN[bnlearn .py]
     BASIC --> PYMDP
@@ -106,6 +107,7 @@ produces no artifacts. Use `rxinfer`, which routes to the canonical renderer.
 | **DisCoPy** | Python | `.py` | Categorical Diagrams, String Diagrams, Compositional Models |
 | **PyTorch** | Python | `.py` | Tensor POMDP; `torch` ships in the `torch` extra (`uv sync --extra torch`; GHSA-rrmf-rvhw-rf47 resolved in torch 2.13.0) |
 | **NumPyro** | Python | `.py` | NUTS/MCMC posterior inference |
+| **cpomdp** | Python | `.py` | Continuous active inference: exact Kalman filter plus enumerated expected-free-energy control (continuous models only; `uv sync --extra cpomdp`) |
 | **Stan** | Stan | `.stan` + `_stan.py` driver | HMM forward-algorithm (Dirichlet A_est, NUTS/MAP) and Kalman marginal-likelihood programs; executed by Step 12 through cmdstanpy (`src/gnn/execute/stan/`) |
 | **bnlearn** | Python | `.py` | Bayesian network structure and inference |
 
@@ -135,6 +137,7 @@ output/11_render_output/
 │   ├── discopy/                # DisCoPy categorical diagrams
 │   ├── pytorch/                # PyTorch Python simulations
 │   ├── numpyro/                # NumPyro Python simulations
+│   ├── cpomdp/                 # cpomdp continuous active inference (continuous models only)
 │   ├── stan/                   # Stan programs (.stan)
 │   ├── bnlearn/                # bnlearn Bayesian networks
 │   └── processing_summary.json # Per-model render summary
@@ -172,7 +175,7 @@ The `--frameworks` flag supports:
 
 | Value | Frameworks Included |
 |-------|---------------------|
-| `all` (default) | pymdp, jax, discopy, rxinfer, activeinference_jl, pytorch, numpyro, stan, bnlearn |
+| `all` (default) | pymdp, jax, discopy, rxinfer, activeinference_jl, pytorch, numpyro, cpomdp, stan, bnlearn |
 | `lite` | pymdp, jax, discopy, bnlearn |
 | Custom | Comma-separated, e.g. `"pymdp,jax"` |
 

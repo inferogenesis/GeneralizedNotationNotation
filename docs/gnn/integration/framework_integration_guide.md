@@ -7,7 +7,7 @@
 
 GNN framework integration is handled by **Steps 11 and 12** of the processing pipeline:
 
-- **`src/gnn/11_render.py`** → Code generation for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, Stan, bnlearn
+- **`src/gnn/11_render.py`** → Code generation for PyMDP, RxInfer.jl, ActiveInference.jl, DisCoPy, JAX, PyTorch, NumPyro, cpomdp, Stan, bnlearn
   - See: **[src/gnn/render/AGENTS.md](../../../src/gnn/render/AGENTS.md)** for rendering module details
 - **`src/gnn/12_execute.py`** → Execution of rendered simulation scripts
   - See: **[src/gnn/execute/AGENTS.md](../../../src/gnn/execute/AGENTS.md)** for execution module details
@@ -37,7 +37,7 @@ cross-framework comparison step.
 
 ## Supported Frameworks
 
-Step 11 renders to 9 registered targets (see `src/gnn/render/AGENTS.md`). Step 12 executes 8 — every render target except bnlearn, which is render-only (Stan via the cmdstanpy driver `<stem>_stan.py`, executor `src/gnn/execute/stan/`; skipped when cmdstanpy/CmdStan is absent). PyTorch and bnlearn are registry-gated unless installed manually. Continuous (linear-Gaussian) models execute on jax, numpyro, pytorch, stan and rxinfer only; the four categorical backends (pymdp, activeinference_jl, discopy, bnlearn) return render status `unsupported` for them, recorded in `render_processing_summary.json` under `unsupported_framework_renderings` and never handed to Step 12:
+Step 11 renders to 10 registered targets (see `src/gnn/render/AGENTS.md`). Step 12 executes 9 — every render target except bnlearn, which is render-only (Stan via the cmdstanpy driver `<stem>_stan.py`, executor `src/gnn/execute/stan/`; skipped when cmdstanpy/CmdStan is absent). PyTorch and bnlearn are registry-gated unless installed manually; cpomdp needs the `cpomdp` extra (`uv sync --extra cpomdp`) and is skipped at Step 12 without it. Continuous (linear-Gaussian) models execute on jax, numpyro, pytorch, stan, rxinfer and cpomdp only; the four categorical backends (pymdp, activeinference_jl, discopy, bnlearn) return render status `unsupported` for them, recorded in `render_processing_summary.json` under `unsupported_framework_renderings` and never handed to Step 12. cpomdp is the mirror image: it renders continuous models only and reports discrete POMDPs as `unsupported` the same way:
 
 | Framework | Per-framework guide |
 |-----------|----------------------|
@@ -48,6 +48,7 @@ Step 11 renders to 9 registered targets (see `src/gnn/render/AGENTS.md`). Step 1
 | DisCoPy | [implementations/discopy.md](../implementations/discopy.md) |
 | PyTorch | [implementations/pytorch.md](../implementations/pytorch.md) |
 | NumPyro | [implementations/numpyro.md](../implementations/numpyro.md) |
+| cpomdp | [implementations/cpomdp.md](../implementations/cpomdp.md) |
 | Stan | [implementations/stan.md](../implementations/stan.md) |
 | bnlearn | `src/gnn/render/AGENTS.md` (no standalone guide yet) |
 
@@ -231,6 +232,6 @@ one animated GIF per model accompanied by a `.manifest.json` reproducibility sid
 ---
 
 **Integration Guide Version**: 3.2.0
-**Render targets**: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, Stan, bnlearn
-**Step 12 executors**: PyMDP, JAX, DisCoPy, RxInfer.jl, ActiveInference.jl, PyTorch, NumPyro, Stan, bnlearn
+**Render targets**: PyMDP, RxInfer.jl, ActiveInference.jl, JAX, DisCoPy, PyTorch, NumPyro, cpomdp, Stan, bnlearn
+**Step 12 executors**: PyMDP, JAX, DisCoPy, RxInfer.jl, ActiveInference.jl, PyTorch, NumPyro, cpomdp, Stan
 **Status**: Maintained

@@ -13,6 +13,7 @@ This module is responsible for running GNN models that have been rendered into f
 | **DisCoPy** | Python | `discopy/` | `*_discopy.py` | ✅ Full support |
 | **PyTorch** | Python | `pytorch/` | `*_pytorch.py` | ✅ Full support |
 | **NumPyro** | Python | `numpyro/` | `*_numpyro.py` | ✅ Full support |
+| **cpomdp** | Python | `cpomdp/` | `*_cpomdp.py` | ✅ Full support (continuous models; requires `uv sync --extra cpomdp`, skipped otherwise; runs over 60 steps need `CPOMDP_ALLOW_LONG=1`) |
 | **Stan** | Python (cmdstanpy driver) | `stan/` | `*_stan.py` | ✅ Full support (requires `uv sync --extra stan` + CmdStan toolchain; skipped otherwise) |
 | **Lean 4** | Lean (fep_lean bridge) | `lean/` | `*.lean` + emitted `*.md` | ✅ Full support (requires the fep_lean checkout via `FEP_LEAN_ROOT`; skipped otherwise) |
 JAX, NumPyro, PyTorch, and DisCoPy are **core** dependencies (`uv sync`). If the environment is incomplete, their scripts report an explicit skipped status. Requested Julia frameworks require Julia plus their package set; in strict requested-framework runs, missing packages make Step 12 fail.
@@ -34,6 +35,7 @@ src/gnn/execute/
 ├── jax/                     # JAX execution
 ├── pytorch/                 # PyTorch execution
 ├── numpyro/                 # NumPyro execution
+├── cpomdp/                  # cpomdp execution (continuous active inference)
 ├── discopy/                 # DisCoPy execution
 │   └── discopy_translator_module/
 ├── stan/                    # Stan execution (cmdstanpy driver runner)

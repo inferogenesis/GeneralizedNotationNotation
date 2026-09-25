@@ -9,11 +9,12 @@ GNN model execution across multiple frameworks.
 - `processor.py` - Execution processor (Step 12 entry point, framework parsing, script discovery, pre-flight skips)
 
 ### Framework Runners
-- `executor.py` - `GNNExecutor` plus the `ExecutorFrameworkSpec` registry (pymdp, rxinfer, discopy, activeinference_jl, jax, numpyro, pytorch)
+- `executor.py` - `GNNExecutor` plus the `ExecutorFrameworkSpec` registry (pymdp, rxinfer, discopy, activeinference_jl, jax, numpyro, cpomdp, pytorch, lean)
 - `jax/` - JAX execution
 - `pymdp/` - PyMDP execution
 - `stan/` - Stan execution (cmdstanpy driver runner; skips when CmdStan is absent)
 - `numpyro/` - NumPyro execution
+- `cpomdp/` - cpomdp execution (optional `cpomdp` extra; 60-step cap without `CPOMDP_ALLOW_LONG=1`)
 
 ## Execution Modes
 - Single model execution
