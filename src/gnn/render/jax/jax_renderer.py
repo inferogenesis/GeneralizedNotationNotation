@@ -60,18 +60,21 @@ def render_gnn_to_jax(
     @Web: https://github.com/google/jax
     @Web: https://flax.readthedocs.io
     """
-    from gnn.render.continuous_common import extract_continuous_spec, is_continuous_spec
+    from gnn.render.continuous_common import (
+        extract_continuous_spec,
+        is_continuous_spec,
+        nominal_sensor_note,
+    )
 
     if is_continuous_spec(gnn_spec):
         # Continuous-state (linear-Gaussian) branch: no A/B/C/D exist, so the
         # discrete extractors below must never run on this path.
         from gnn.render.continuous_script import generate_continuous_script
 
+        continuous = extract_continuous_spec(gnn_spec)
         return _render_to_path(
-            lambda spec, _opts: generate_continuous_script(
-                extract_continuous_spec(spec), "jax"
-            ),
-            "JAX continuous LGSSM",
+            lambda spec, _opts: generate_continuous_script(continuous, "jax"),
+            "JAX continuous LGSSM" + nominal_sensor_note(continuous),
             gnn_spec,
             output_path,
             options,

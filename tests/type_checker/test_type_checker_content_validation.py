@@ -460,3 +460,91 @@ def test_classify_time_spec_agrees_with_detect_time_dynamics() -> None:
         classified = classify_time_spec(content)
         assert (classified == "Dynamic") == detect_time_dynamics(content), content
         assert (classified != "Static") >= detect_time_dynamics(content), content
+
+
+_CONTINUOUS_SENSOR = """## GNNSection
+ActInfContinuous
+
+## ModelName
+Beacon
+
+## StateSpaceBlock
+x[2,1,type=float]
+y[2,1,type=float]
+F[2,2,type=float]
+H[2,2,type=float]
+Q[2,2,type=float]
+R[2,2,type=float]
+prior_mean[2,type=float]
+prior_cov[2,2,type=float]
+R_x_family[1,type=string]
+R_x_params[4,type=float]
+
+## Connections
+x>y
+
+## InitialParameterization
+F={(1.0,0.0),(0.0,1.0)}
+H={(1.0,0.0),(0.0,1.0)}
+Q={(0.05,0.0),(0.0,0.05)}
+R={(0.1,0.0),(0.0,0.1)}
+prior_mean={(0.0,0.0)}
+prior_cov={(0.5,0.0),(0.0,0.5)}
+R_x_family=quadratic_beacon   # sharper near the beacon
+R_x_params={(2.0, 2.0, 0.05, 1.0)}
+
+## Footer
+Beacon
+"""
+
+
+def test_sensor_family_rule_accepts_known_family_with_right_arity() -> None:
+    from gnn.type_checker.checking.continuous import validate_sensor_family
+
+    result = GNNTypeChecker().validate_content(_CONTINUOUS_SENSOR, source_name="b.md")
+    assert result["valid"], result["errors"]
+    assert result["sensor_family"] == {
+        "declared": True,
+        "family": "quadratic_beacon",
+        "arity": 4,
+        "errors": [],
+    }
+    # Files without the keys never carry the field.
+    plain = GNNTypeChecker().validate_content(_VALID_MINIMAL, source_name="m.md")
+    assert "sensor_family" not in plain
+    assert (
+        validate_sensor_family("## InitialParameterization\nA={(1.0)}\n")["declared"]
+        is False
+    )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "fragment"),
+    [
+        (("R_x_family=quadratic_beacon", "R_x_family=magic"), "Unknown R_x_family"),
+        (
+            ("R_x_params={(2.0, 2.0, 0.05, 1.0)}", "R_x_params={(2.0, 2.0)}"),
+            "takes 4 parameter",
+        ),
+        (
+            (
+                "R_x_params={(2.0, 2.0, 0.05, 1.0)}",
+                "R_x_params={(2.0, two, 0.05, 1.0)}",
+            ),
+            "numeric vector",
+        ),
+        (
+            ("R_x_family=quadratic_beacon   # sharper near the beacon\n", ""),
+            "without R_x_family",
+        ),
+    ],
+)
+def test_sensor_family_rule_rejects_bad_declarations(
+    mutation: tuple[str, str], fragment: str
+) -> None:
+    content = _CONTINUOUS_SENSOR.replace(*mutation)
+    result = GNNTypeChecker().validate_content(content, source_name="bad.md")
+    assert result["valid"] is False
+    assert any("[GNN-E007]" in e and fragment in e for e in result["errors"]), result[
+        "errors"
+    ]

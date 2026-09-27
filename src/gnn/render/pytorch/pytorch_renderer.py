@@ -91,15 +91,20 @@ def _render_continuous(
     model_name: str,
 ) -> Tuple[bool, str, List[str]]:
     """Emit the standalone PyTorch Kalman-filter LGSSM script."""
-    from gnn.render.continuous_common import extract_continuous_spec
+    from gnn.render.continuous_common import (
+        extract_continuous_spec,
+        nominal_sensor_note,
+    )
     from gnn.render.continuous_script import generate_continuous_script
 
-    code = generate_continuous_script(extract_continuous_spec(gnn_spec), "pytorch")
+    continuous = extract_continuous_spec(gnn_spec)
+    code = generate_continuous_script(continuous, "pytorch")
     atomic_write_text(output_path, code)
     logger.info(f"✅ PyTorch continuous script written to: {output_path}")
     return (
         True,
-        f"PyTorch continuous LGSSM script generated: {output_path}",
+        f"PyTorch continuous LGSSM script generated: {output_path}"
+        + nominal_sensor_note(continuous),
         [str(output_path)],
     )
 

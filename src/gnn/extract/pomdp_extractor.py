@@ -1369,6 +1369,12 @@ class POMDPExtractor:
                 value_str[:40],
             )
 
+        # Bare identifiers are string-valued parameters (e.g. the
+        # ``R_x_family`` sensor-family name of a continuous model); they were
+        # previously dropped to ``None``.
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", value_str):
+            return value_str
+
         # Handle structured data (tuples/nested lists)
         if "(" in value_str or "[" in value_str:
             try:

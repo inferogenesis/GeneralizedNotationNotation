@@ -38,8 +38,9 @@ def test_ontology_terms_file_loads_and_contains_core_concepts() -> Any:
         }
     else:
         pytest.fail(f"Unexpected ontology file shape: {type(data).__name__}")
-    # Core Active Inference concepts that MUST be present.
-    core: set[Any] = {"HiddenState", "Observation"}
+    # Core Active Inference concepts that MUST be present, plus the
+    # continuous-model sensor term the cpomdp integration annotates with.
+    core: set[Any] = {"HiddenState", "Observation", "StateDependentObservationNoise"}
     assert core.issubset(term_names), (
         f"Core AI terms missing: {core - term_names}. Ontology file is corrupt or underspecified."
     )

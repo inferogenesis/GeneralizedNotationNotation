@@ -55,13 +55,16 @@ def render_gnn_to_stan(
         from gnn.render.continuous_common import (
             extract_continuous_spec,
             is_continuous_spec,
+            nominal_sensor_note,
         )
 
+        note = ""
         if is_continuous_spec(gnn_spec):
             spec = extract_continuous_spec(gnn_spec)
             program = _continuous_program()
             driver = _continuous_driver(spec, stan_path.name)
             kind = "continuous LGSSM"
+            note = nominal_sensor_note(spec)
         else:
             params = _discrete_parameters(gnn_spec)
             program = _discrete_program()
@@ -73,7 +76,8 @@ def render_gnn_to_stan(
         logger.info(f"✅ Stan {kind} program + driver written to: {output_path.parent}")
         return (
             True,
-            f"Stan {kind} program generated: {stan_path.name} (+ driver {output_path.name})",
+            f"Stan {kind} program generated: {stan_path.name} (+ driver {output_path.name})"
+            + note,
             [str(output_path), str(stan_path)],
         )
     except Exception as exc:

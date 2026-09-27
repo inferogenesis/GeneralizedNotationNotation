@@ -20,7 +20,7 @@ specification disagree, the specification wins and the file here is the bug.
 | `architecture_reference.md` | Pipeline architecture overview |
 
 ## Versioning
-- GNN language version: tracked in [`docs/gnn/gnn_syntax.md`](../gnn_syntax.md) (v1.1)
+- GNN language version: tracked in [`docs/gnn/gnn_syntax.md`](../gnn_syntax.md) (v1.2)
 - Document bundle version: inherits from [`docs/gnn/SPEC.md`](../SPEC.md)
 - Package version: 3.3.0 (matches `pyproject.toml`)
 

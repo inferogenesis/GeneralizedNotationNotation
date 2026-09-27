@@ -8,7 +8,7 @@ Pins the real behaviour introduced/exposed by the v1.7.0 refactor:
   - public ``analyze_ontology_content`` (single parse->load->validate entry point)
   - public ``summarise_coverage`` (human-readable coverage line)
   - public ``build_ontology_terms`` (in-memory vocabulary builder)
-  - ``act_inf_ontology_terms.json`` dedup invariant (64 unique canonical terms)
+  - ``act_inf_ontology_terms.json`` dedup invariant (65 unique canonical terms)
   - ``extract_ontology_annotations_mcp`` validating against the real vocabulary
 
 Deterministic, isolated, no network.
@@ -334,11 +334,11 @@ class TestVocabularyDedup:
         # Time keeps its earlier TEMP URI (the duplicate TEMP_000066 was removed).
         assert terms["Time"]["uri"] == "obo:TEMP_000019"
 
-    def test_load_returns_64_unique_terms(self) -> None:
+    def test_load_returns_65_unique_terms(self) -> None:
         from gnn.ontology import load_defined_ontology_terms
 
         terms = load_defined_ontology_terms()
-        assert len(terms) == 64
+        assert len(terms) == 65
         # Core Active Inference concepts that must always be present.
         assert {
             "HiddenState",
@@ -505,7 +505,7 @@ class TestOntologyTermIndex:
         from gnn.ontology import OntologyTermIndex
 
         index = OntologyTermIndex.from_file()
-        assert len(index) == 64
+        assert len(index) == 65
         assert "HiddenState" in index
 
 
@@ -580,7 +580,7 @@ class TestMcpCanonicalTermsList:
         result = list_standard_ontology_terms_mcp()
         assert result["success"] is True
         vocabulary = load_defined_ontology_terms()
-        assert result["count"] == len(vocabulary) == 64
+        assert result["count"] == len(vocabulary) == 65
         assert set(result["terms"]) == set(vocabulary)
 
     def test_descriptions_are_nonempty_strings(self) -> None:

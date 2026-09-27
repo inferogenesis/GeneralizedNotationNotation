@@ -25,6 +25,7 @@ The Type Checker agent provides a rigorously unified structural mapping layer en
 *   **`checking/sections.py`**: Pure, section-scoped content extraction (`extract_markdown_section`, `parse_resource_connections`, `section_presence`, `detect_time_dynamics`) shared by the checker and the estimator so connection operators in prose are never mistaken for real edges.
 *   **`checking/summary.py`**: `ValidationSummary` TypedDict + `summarize_type_check_results` — the typed aggregation consumed by reports and downstream steps.
 *   **`checking/dimensions.py`**: Dimensionality extraction and POMDP matrix constraint checking (incl. B-orientation verdicts).
+*   **`checking/continuous.py`**: State-dependent observation-noise declaration check for continuous files — `R_x_family` must be a known family and `R_x_params` must carry its arity (`[GNN-E007]`).
 *   **`estimation/estimator.py`**: A specialized computational layer (`GNNResourceEstimator`) evaluating edge densities and variable bounds simulating raw hardware execution strains; classifies `## Time` as Static/Dynamic/Hierarchical.
 *   **`visualizer.py`**: Natively generates `[model_name]_card.png` files rendering trading cards, dropping previews directly into `type_check_summary.md` via inline images to ensure highly legible output execution states.
 

@@ -44,6 +44,7 @@ def render_gnn_to_numpyro(
         from gnn.render.continuous_common import (
             extract_continuous_spec,
             is_continuous_spec,
+            nominal_sensor_note,
         )
 
         if is_continuous_spec(gnn_spec):
@@ -51,15 +52,15 @@ def render_gnn_to_numpyro(
             # on the same generative model. No A/B/C/D exist on this path.
             from gnn.render.continuous_script import generate_continuous_script
 
-            code = generate_continuous_script(
-                extract_continuous_spec(gnn_spec), "numpyro"
-            )
+            continuous = extract_continuous_spec(gnn_spec)
+            code = generate_continuous_script(continuous, "numpyro")
             output_path = Path(output_path)
             atomic_write_text(output_path, code)
             logger.info(f"✅ NumPyro continuous script written to: {output_path}")
             return (
                 True,
-                f"NumPyro continuous LGSSM script generated: {output_path}",
+                f"NumPyro continuous LGSSM script generated: {output_path}"
+                + nominal_sensor_note(continuous),
                 [str(output_path)],
             )
 

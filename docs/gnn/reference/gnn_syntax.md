@@ -1,6 +1,6 @@
 # GNN Syntax Reference
 
-**GNN language version**: v1.1
+**GNN language version**: v1.2
 **Last Updated**: 2026-08-19
 **Status**: Maintained  
 
@@ -234,6 +234,9 @@ Q={(0.05,0.0),(0.0,0.05)}      # process noise
 R={(0.1,0.0),(0.0,0.1)}        # observation noise
 prior_mean={(0.0,0.0)}
 prior_cov={(0.5,0.0),(0.0,0.5)}
+# Optional state-dependent observation noise R(x) on top of the nominal R (v1.2)
+R_x_family=quadratic_beacon      # constant | quadratic_beacon | blind_spot | beacon_and_blind_spot
+R_x_params={(2.0,2.0,0.05,1.0)}  # [cx, cy, r_min, k]
 
 # Dirichlet pseudo-counts — A becomes a learned latent, not a constant
 dirichlet_A={(8.0,1.0,1.0),(1.0,8.0,1.0),(1.0,1.0,8.0)}
@@ -251,8 +254,13 @@ symbol declared in `StateSpaceBlock` (so the dimension check reports no
 kind the renderer dispatches on — `detect_model_kind` routes these files as
 CONTINUOUS; the normative rules and precedence order are in
 [`gnn_syntax.md` § Parameterization families](../gnn_syntax.md#parameterization-families).
-JAX, NumPyro, PyTorch, Stan and RxInfer.jl render and execute them; PyMDP,
-ActiveInference.jl, DisCoPy and bnlearn report render status `unsupported`.
+JAX, NumPyro, PyTorch, Stan, RxInfer.jl and cpomdp render and execute them; PyMDP,
+ActiveInference.jl, DisCoPy and bnlearn report render status `unsupported`
+(and cpomdp reports discrete models `unsupported`). The optional `R_x_family`
++ `R_x_params` pair declares a state-dependent observation noise (closed
+vocabulary, arity-checked by Step 5 as `GNN-E007`); only cpomdp realises it,
+the other continuous backends keep the nominal `R` and say so in their render
+message. See [`gnn_syntax.md` § v1.2 Extension](../gnn_syntax.md#v12-extension--state-dependent-observation-noise-rx).
 
 ## Canonical matrix orientation (B)
 

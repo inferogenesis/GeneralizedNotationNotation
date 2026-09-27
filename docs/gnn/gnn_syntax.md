@@ -1,6 +1,6 @@
-# GNN v1.1 Syntax Specification
+# GNN v1.2 Syntax Specification
 
-> **Status**: Living document · Last updated 2026-04-14
+> **Status**: Living document · Last updated 2026-09-27
 > **Canonical reference for parsers, validators, and editor support.**
 > For the condensed example-driven companion, see [reference/gnn_syntax.md](reference/gnn_syntax.md).
 
@@ -16,7 +16,7 @@ introduced by a level-2 header (`## SectionName`).
 | Section | Purpose |
 |---------|---------|
 | `## GNNSection` | Short identifier (no spaces; e.g. `ActInfPOMDP`) |
-| `## GNNVersionAndFlags` | `GNN v1`, `GNN v1.0`, or `GNN v1.1` with optional flags |
+| `## GNNVersionAndFlags` | `GNN v1`, `GNN v1.0`, `GNN v1.1`, or `GNN v1.2` with optional flags |
 | `## ModelName` | Human-readable model title |
 | `## StateSpaceBlock` | Variable and matrix declarations |
 | `## Connections` | Edge list between state-space variables |
@@ -155,7 +155,7 @@ than one family at once.
 | Family | Keys | Meaning |
 |--------|------|---------|
 | Discrete POMDP | `A`, `B`, `C`, `D`, `E` | Likelihood, transition, preferences, initial prior, habit prior. `B` is ordered `(next_state, previous_state, action)`. |
-| Linear-Gaussian | `F`, `H`, `Q`, `R`, `prior_mean`, `prior_cov` | State-space system matrices: state transition, observation readout, process noise, observation noise, and the Gaussian prior over the initial latent. |
+| Linear-Gaussian | `F`, `H`, `Q`, `R`, `prior_mean`, `prior_cov` | State-space system matrices: state transition, observation readout, process noise, observation noise, and the Gaussian prior over the initial latent. Optional `goal_mean` + `control_gain` close the loop; optional `R_x_family` + `R_x_params` (v1.2) declare a state-dependent observation noise on top of the nominal `R`. |
 | Dirichlet priors | `dirichlet_A` … `dirichlet_E` | Pseudo-counts for a matrix treated as a latent variable rather than a fixed constant. |
 | Per-level / per-agent | `A_level1`, `B_level2`, …; `A_agent1`, `B_agent2`, … | Suffixed copies of the POMDP matrices, one set per hierarchy level or per agent. |
 
@@ -195,13 +195,55 @@ matrix-dimension check reports no findings. The scalar Variational Free Energy
 readout `F[1]` used by discrete files is not declared in continuous files —
 `F` is the state-transition matrix here.
 
-Framework support follows from the state space: JAX, NumPyro, PyTorch, Stan
-and RxInfer.jl render and execute continuous models natively (Kalman filter;
-NumPyro and Stan additionally run NUTS over the same model). PyMDP,
+Framework support follows from the state space: JAX, NumPyro, PyTorch, Stan,
+RxInfer.jl and cpomdp render and execute continuous models natively (Kalman
+filter; NumPyro and Stan additionally run NUTS over the same model; cpomdp
+chooses actions by an enumerated expected-free-energy search). PyMDP,
 ActiveInference.jl, DisCoPy and bnlearn are categorical and report the model as
 **unsupported** ("continuous-state model: … supports discrete POMDPs only") —
 a distinct status from a failure, excluded from render success rates and from
-Step 12 execution.
+Step 12 execution. cpomdp reports discrete models `unsupported` in turn.
+
+#### v1.2 Extension — State-dependent observation noise `R(x)`
+
+A continuous file may declare that the observation noise varies with the
+hidden state. `R` stays required and is the **nominal** matrix, so model-kind
+detection is unchanged; two optional keys describe how `R(x)` departs from it:
+
+```gnn
+## StateSpaceBlock
+R_x_family[1,type=string]   # observation-noise family (closed vocabulary)
+R_x_params[4,type=float]    # the family's parameters
+
+## InitialParameterization
+R_x_family=quadratic_beacon
+R_x_params={(2.0, 2.0, 0.05, 1.0)}   # [cx, cy, r_min, k]
+
+## ActInfOntologyAnnotation
+R_x_family=StateDependentObservationNoise
+```
+
+`R_x_family` takes one of four names; there is no expression syntax. Each
+family reads a planar position from the first two state dimensions and scales
+the nominal `R` by a positive factor `s(x)`, `d = ‖x[:2] − (cx, cy)‖`:
+
+| `R_x_family` | `R_x_params` | `s(x)` |
+|---|---|---|
+| `constant` | `{()}` (arity 0) | `1` — the nominal `R` through the state-dependent code path |
+| `quadratic_beacon` | `[cx, cy, r_min, k]` | `r_min + k·d²` — sharp at the beacon, noise grows with distance |
+| `blind_spot` | `[cx, cy, radius, r_dead]` | `1 + (r_dead − 1)·exp(−d²/radius²)` — noise saturates at `r_dead·R` inside the disc |
+| `beacon_and_blind_spot` | beacon params then blind-spot params (arity 8) | the product of the two factors |
+
+Step 5 rejects an unknown family or a parameter vector whose length is not
+the family's arity (`[GNN-E007]`), and the renderers refuse the same at
+render time. Only the cpomdp backend realises `R(x)` (its emitted script
+builds a `CallableSensor` and steers with an `ObservationGoal`); JAX, NumPyro,
+PyTorch, Stan and RxInfer.jl keep the nominal `R` and append
+`state-dependent R declared, this backend uses nominal R` to their render
+message, which lands in `render_processing_summary.json`. Under a fixed `R`
+the epistemic term of expected free energy is the same for every policy;
+`R(x)` is what lets it move, so `curious_rocket.md` and `ecoli_chemotaxis.md`
+under `input/gnn_files/continuous/` are the exemplars to read.
 
 #### Dirichlet pseudo-counts
 
@@ -295,6 +337,7 @@ by Step 10. Note the conventional binding: `A` is the **likelihood**
 | `GNN-E003` | Unknown variable in connection (**reserved, not yet enforced** — `src/gnn/schema/parser.py` reports this condition as the `GNN-W002` warning instead) |
 | `GNN-E004` | Duplicate variable declaration |
 | `GNN-E005` | Unparseable connection syntax |
+| `GNN-E007` | Unknown `R_x_family` or `R_x_params` arity mismatch (continuous files) |
 
 | Warning Code | Meaning |
 |--------------|---------|

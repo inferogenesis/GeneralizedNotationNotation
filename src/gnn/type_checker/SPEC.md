@@ -18,6 +18,7 @@ type_checker/
 │   ├── sections.py          # Section-scoped content extraction (shared w/ estimation)
 │   ├── summary.py           # ValidationSummary TypedDict + summarize_type_check_results
 │   ├── dimensions.py        # Shape analysis + B-orientation verdicts
+│   ├── continuous.py        # R_x_family / R_x_params arity check (continuous files)
 │   └── rules.py             # Type rule engine
 ├── estimation/              # Resource estimation subpackage
 │   ├── estimator.py         # GNNResourceEstimator (## Time classifier)

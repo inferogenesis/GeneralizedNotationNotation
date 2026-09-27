@@ -217,6 +217,16 @@ def render_gnn_to_rxinfer(
             return False, f"Error writing RxInfer.jl script: {write_error}", []
 
         message = f"Generated RxInfer.jl simulation script: {output_path}"
+        from gnn.render.continuous_common import (
+            extract_continuous_spec,
+            is_continuous_spec,
+            nominal_sensor_note,
+        )
+
+        if is_continuous_spec(gnn_spec):
+            # The RxInfer LGSSM program keeps the nominal R; say so when a
+            # state-dependent sensor family is declared.
+            message += nominal_sensor_note(extract_continuous_spec(gnn_spec))
         warnings: list[Any] = []
 
         # Check for potential issues

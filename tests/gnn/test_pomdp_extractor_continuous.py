@@ -34,6 +34,28 @@ def test_continuous_exemplar_extracts_lgssm(path: Path) -> None:
     assert "A" not in spec["initialparameterization"]
 
 
+def test_bare_string_parameters_survive_extraction(tmp_path: Path) -> None:
+    """``R_x_family=quadratic_beacon`` is a string value, not a dropped None."""
+    source = (CONTINUOUS_DIR / "continuous_navigation.md").read_text()
+    source = source.replace(
+        "control_gain={(0.3)}\n",
+        "control_gain={(0.3)}\nR_x_family=quadratic_beacon\n"
+        "R_x_params={(2.0, 2.0, 0.05, 1.0)}\n",
+    ).replace(
+        "control_gain[1,type=float] # scalar proportional gain\n",
+        "control_gain[1,type=float] # scalar proportional gain\n"
+        "R_x_family[1,type=string]\nR_x_params[4,type=float]\n",
+    )
+    path = tmp_path / "beacon.md"
+    path.write_text(source)
+    pomdp = extract_pomdp_from_file(path, strict_validation=True)
+    assert pomdp is not None and pomdp.initial_parameterization is not None
+    assert pomdp.initial_parameterization["R_x_family"] == "quadratic_beacon"
+    assert pomdp.initial_parameterization["R_x_params"] == [2.0, 2.0, 0.05, 1.0]
+    spec = pomdp_to_gnn_spec(pomdp)
+    assert spec["initialparameterization"]["R_x_family"] == "quadratic_beacon"
+
+
 def test_navigation_is_closed_loop_others_passive() -> None:
     kinds: dict[str, bool] = {}
     for p in FILES:

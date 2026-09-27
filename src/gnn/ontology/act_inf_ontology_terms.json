@@ -254,5 +254,9 @@
     "Habit": {
         "description": "A prior probability distribution over possible actions or policies, representing habitual behavior patterns (e.g., 'E' matrix).",
         "uri": "obo:TEMP_000064"
+    },
+    "StateDependentObservationNoise": {
+        "description": "An observation-noise covariance that varies with the hidden state, R(x), so the precision of sensing depends on where the agent is (e.g., a beacon that sharpens readings or a blind spot that degrades them); the state-dependence is what gives the epistemic term of expected free energy a non-constant value in linear-Gaussian models.",
+        "uri": "obo:TEMP_000065"
     }
 }

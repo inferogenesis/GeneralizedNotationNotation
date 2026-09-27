@@ -20,6 +20,7 @@ from gnn.utils.observability.structured_logging import (
 )
 
 from ..estimation.strategies import VariableMap, calculate_complexity
+from .continuous import validate_sensor_family
 from .dimensions import (
     extract_b_matrix_evidence,
     extract_gnn_dimensions_with_diagnostics,
@@ -472,6 +473,13 @@ class GNNTypeChecker:
                 validation_result["valid"] = False
             for warning in dim_check["warnings"]:
                 validation_result["warnings"].append(warning)
+
+        sensor_check = validate_sensor_family(content)
+        if sensor_check["declared"]:
+            validation_result["sensor_family"] = sensor_check
+            if sensor_check["errors"]:
+                validation_result["errors"].extend(sensor_check["errors"])
+                validation_result["valid"] = False
 
         resources = estimate_file_resources(content)
         validation_result["resource_estimation"] = resources

@@ -77,6 +77,88 @@ def _assert_schema(res: Dict[str, Any], framework: str, with_control: bool) -> N
         assert all(c == 0.0 for row in res["controls"] for c in row)
 
 
+def _sensor_spec(family: str | None, params: list[float] | None) -> Dict[str, Any]:
+    spec = _spec(True)
+    initial = spec["initialparameterization"]
+    if family is not None:
+        initial["R_x_family"] = family
+    if params is not None:
+        initial["R_x_params"] = params
+    return spec
+
+
+def test_sensor_family_extraction_and_validation() -> None:
+    from gnn.render.continuous_common import SENSOR_FAMILIES, extract_sensor_family
+
+    assert SENSOR_FAMILIES == {
+        "constant": 0,
+        "quadratic_beacon": 4,
+        "blind_spot": 4,
+        "beacon_and_blind_spot": 8,
+    }
+    plain = extract_continuous_spec(_spec(True))
+    assert plain.R_x_family is None and plain.R_x_params is None
+    assert not plain.has_state_dependent_sensor
+
+    beacon = extract_continuous_spec(
+        _sensor_spec("quadratic_beacon", [1.0, 0.0, 0.05, 1.0])
+    )
+    assert beacon.R_x_family == "quadratic_beacon"
+    assert beacon.has_state_dependent_sensor
+    assert beacon.R_x_params is not None and beacon.R_x_params.tolist() == [
+        1.0,
+        0.0,
+        0.05,
+        1.0,
+    ]
+    both = extract_continuous_spec(
+        _sensor_spec("beacon_and_blind_spot", [1, 0, 0.05, 1, -1, 0, 0.5, 20])
+    )
+    assert both.R_x_params is not None and both.R_x_params.shape == (8,)
+    constant = extract_continuous_spec(_sensor_spec("constant", []))
+    assert constant.R_x_family == "constant"
+    # The extractor writes ``{quadratic_beacon}`` as a one-element list.
+    assert (
+        extract_sensor_family(
+            {"R_x_family": ["blind_spot"], "R_x_params": [0.0, 0.0, 0.5, 20.0]}, 2
+        )[0]
+        == "blind_spot"
+    )
+
+    with pytest.raises(ValueError, match="unknown R_x_family"):
+        extract_continuous_spec(_sensor_spec("magic", [1.0]))
+    with pytest.raises(ValueError, match="takes 4 parameter"):
+        extract_continuous_spec(_sensor_spec("quadratic_beacon", [1.0, 0.0]))
+    with pytest.raises(ValueError, match="without R_x_family"):
+        extract_continuous_spec(_sensor_spec(None, [1.0, 0.0, 0.05, 1.0]))
+    with pytest.raises(ValueError, match="r_min > 0"):
+        extract_continuous_spec(_sensor_spec("quadratic_beacon", [1.0, 0.0, 0.0, 1.0]))
+    with pytest.raises(ValueError, match="radius > 0"):
+        extract_continuous_spec(_sensor_spec("blind_spot", [1.0, 0.0, 0.0, 20.0]))
+    with pytest.raises(ValueError, match="planar position"):
+        extract_sensor_family(
+            {"R_x_family": "quadratic_beacon", "R_x_params": [1, 0, 0.05, 1]}, 1
+        )
+
+
+def test_other_continuous_backends_keep_nominal_r_and_say_so(tmp_path: Path) -> None:
+    """A declared R(x) is a render-message note on every non-cpomdp backend."""
+    from gnn.render.continuous_common import NOMINAL_SENSOR_NOTE
+
+    spec = _sensor_spec("quadratic_beacon", [1.0, 0.0, 0.05, 1.0])
+    for fn, name in (
+        (render_gnn_to_jax, "s_jax.py"),
+        (render_gnn_to_numpyro, "s_numpyro.py"),
+        (render_gnn_to_pytorch, "s_pytorch.py"),
+        (render_gnn_to_stan, "s_stan.py"),
+    ):
+        ok, msg, _ = fn(spec, tmp_path / name)
+        assert ok, f"{name}: {msg}"
+        assert NOMINAL_SENSOR_NOTE in msg, (name, msg)
+    ok, msg, _ = render_gnn_to_jax(_spec(True), tmp_path / "plain_jax.py")
+    assert ok and NOMINAL_SENSOR_NOTE not in msg
+
+
 def test_detection_and_extraction() -> None:
     spec = extract_continuous_spec(_spec(True))
     assert is_continuous_spec(_spec(False))
