@@ -25,7 +25,7 @@ from gnn.render.cpomdp import render_gnn_to_cpomdp
 ok, message, artifacts = render_gnn_to_cpomdp(spec, out_path, {"control_mode": "parity"})
 ```
 
-Options: `control_mode` (`efe` | `parity`), `action_scale`, `horizon`, `goal_precision`; also readable from `ModelParameters` as `cpomdp_<option>`.
+Options: `control_mode` (`efe` | `parity`), `action_scale`, `horizon`, `goal_precision`; also readable from `ModelParameters` as `cpomdp_<option>`. A declared `R_x_family` + `R_x_params` pair makes the emitted script sense through a `CallableSensor` and steer with an `ObservationGoal`.
 
 ## Output
 

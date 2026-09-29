@@ -3,7 +3,7 @@
 > **GNN Integration Layer**: Python / JAX-based continuous active inference
 > **Framework Base**: `cpomdp >= 0.4.4, < 0.5` (the continuous-state sibling of pymdp)
 > **Simulation Architecture**: Exact Kalman filtering plus enumerated expected-free-energy (EFE) action search
-> **Documentation Version**: 1.0.0
+> **Documentation Version**: 1.1.0
 
 ## Overview
 
@@ -63,6 +63,38 @@ The loop drives `KalmanBackend.infer_states` directly so it can record the full
 without a predict step. JAX is seeded from `RANDOM_SEED` with x64 enabled and
 the sampling order matches `render/continuous_script.py`.
 
+## State-dependent sensing (`R_x_family`)
+
+The v1.2 language extension lets a continuous file declare a state-dependent
+observation noise on top of the nominal `R` (see
+[`gnn_syntax.md` § v1.2 Extension](../gnn_syntax.md#v12-extension--state-dependent-observation-noise-rx)):
+
+```gnn
+R_x_family=quadratic_beacon
+R_x_params={(2.0, 2.0, 0.05, 1.0)}   # [cx, cy, r_min, k]
+```
+
+When the family is set, the emitted script builds a `CallableSensor` from a
+small in-script library — `constant`, `quadratic_beacon`, `blind_spot`,
+`beacon_and_blind_spot`, each scaling the nominal `R` by a positive factor of
+the planar position — and passes it to `LinearGaussianModel` via
+`observation=` (never `sensor_noise=`). The goal type follows the sensor
+type: `ObservationGoal(H @ goal_mean)` under the callable sensor,
+`StateGoal(goal_mean)` under a fixed `R`; cpomdp refuses the other pairing
+when the `Agent` is built, and the renderer tests pin both. True
+observations are sampled with `R(x_true)`, the filter linearises at the
+predicted mean, and the EFE search sees the state-dependent noise. That is
+what makes the epistemic term differ across policies: the results carry
+`epistemic_by_policy_t0` / `pragmatic_by_policy_t0` (every enumerated
+policy's split at the first step), and `sensor_kind` reads
+`"state_dependent"` with `R_x_family` / `R_x_params` echoed. Under
+`constant` (or any fixed `R`) the epistemic column is identical for every
+policy — the collapse the extension exists to escape.
+
+The other continuous backends keep the nominal `R` and append
+`state-dependent R declared, this backend uses nominal R` to their render
+message.
+
 ## Control modes
 
 | `control_mode` | Action | Purpose |
@@ -88,7 +120,8 @@ Options (`control_mode`, `action_scale` = 0.5, `horizon` = 1, `goal_precision`
 | `epistemic_term`, `pragmatic_term` | the split of the selected policy's `G`, per step |
 | `selected_policy_index` | argmin of `G` per step |
 | `horizon`, `action_scale`, `n_policies`, `search_warrant` | search configuration and cpomdp's completeness certificate (`PROVED …`) |
-| `sensor_kind`, `R_x_family` | `"fixed"` / `null` for the current contract |
+| `sensor_kind`, `R_x_family`, `R_x_params` | `"fixed"` / `null` / `null`, or `"state_dependent"` with the declared family and parameters |
+| `epistemic_by_policy_t0`, `pragmatic_by_policy_t0` | every enumerated policy's split at the first step (constant across policies under a fixed `R`) |
 | `cpomdp_version`, `jax_version` | runtime versions |
 
 `validation` carries `means_finite`, `posterior_cov_psd`, `rmse_finite`,

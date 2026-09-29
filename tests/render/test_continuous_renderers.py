@@ -215,6 +215,91 @@ def test_cpomdp_continuous_renders_and_runs(
         assert res["efe_history"] == [] and res["n_policies"] == 0
 
 
+@pytest.mark.needs_cpomdp
+@pytest.mark.parametrize(
+    ("family", "params"),
+    [
+        ("constant", []),
+        ("quadratic_beacon", [1.0, 0.0, 0.05, 1.0]),
+        ("blind_spot", [1.0, 0.0, 0.5, 20.0]),
+        ("beacon_and_blind_spot", [1.0, 0.0, 0.05, 1.0, -1.0, 0.0, 0.5, 20.0]),
+    ],
+)
+def test_cpomdp_state_dependent_sensor_renders_and_runs(
+    tmp_path: Path, family: str, params: list[float]
+) -> None:
+    """R(x) families emit a CallableSensor + ObservationGoal and run end to end."""
+    ok, msg, arts = render_gnn_to_cpomdp(
+        _sensor_spec(family, params), tmp_path / f"{family}_cpomdp.py"
+    )
+    assert ok, msg
+    assert f"R(x) family {family}" in msg
+    code = Path(arts[0]).read_text()
+    assert "CallableSensor(" in code and "ObservationGoal(" in code
+    assert f"R_X_FAMILY = {family!r}" in code
+    assert (
+        "StateGoal(goal"
+        not in code.split("def build_objective")[1].split(
+            "if model.observation is None"
+        )[0]
+    )
+    res = _run(Path(arts[0]), "CPOMDP_OUTPUT_DIR", tmp_path / f"out_{family}")
+    _assert_schema(res, "cpomdp", True)
+    assert res["sensor_kind"] == "state_dependent"
+    assert res["R_x_family"] == family and res["R_x_params"] == params
+    assert res["validation"]["efe_finite"] is True
+    assert len(res["efe_history"]) == T
+    t0 = res["epistemic_by_policy_t0"]
+    assert len(t0) == res["n_policies"] == 9
+    assert all(v > 0 for v in t0)
+    spread = max(t0) - min(t0)
+    if family == "constant":
+        # R(x) = R: the linear-Gaussian collapse — every policy gains the same.
+        assert spread < 1e-9
+    else:
+        assert spread > 1e-6
+
+
+def test_cpomdp_fixed_sensor_keeps_state_goal(tmp_path: Path) -> None:
+    ok, msg, arts = render_gnn_to_cpomdp(_spec(True), tmp_path / "fixed_cpomdp.py")
+    assert ok and "fixed R" in msg
+    code = Path(arts[0]).read_text()
+    assert 'SENSOR_KIND = "fixed"' in code and "R_X_FAMILY = None" in code
+    assert "SENSOR_FAMILY_LIBRARY" not in code
+    assert "StateGoal(goal" in code
+
+
+@pytest.mark.needs_cpomdp
+def test_cpomdp_refuses_state_goal_on_state_dependent_sensor() -> None:
+    """The pairing the renderer never emits is refused by cpomdp itself."""
+    import jax.numpy as jnp
+    from cpomdp import (
+        Agent,
+        Belief,
+        CallableSensor,
+        LinearGaussianModel,
+        ObservationGoal,
+        StateGoal,
+    )
+
+    def noise(x, params):
+        return params * (1.0 + x[0] ** 2)
+
+    sensor = CallableSensor(jnp.eye(2), noise, jnp.eye(2) * 0.1)
+    model = LinearGaussianModel(
+        dynamics=jnp.eye(2),
+        sensor_model=jnp.eye(2),
+        dynamics_noise=jnp.eye(2) * 0.05,
+        sensor_noise=jnp.eye(2) * 0.1,
+        prior=Belief([0.0, 0.0], jnp.eye(2)),
+        control=jnp.array([[1.0], [0.0]]),
+        observation=sensor,
+    )
+    with pytest.raises(ValueError, match="StateGoal needs a fixed sensor"):
+        Agent(model, StateGoal([1.0, 0.0]))
+    Agent(model, ObservationGoal([1.0, 0.0], action_bounds=(-0.5, 0.5)))
+
+
 def test_cpomdp_rejects_bad_options(tmp_path: Path) -> None:
     ok, msg, arts = render_gnn_to_cpomdp(
         _spec(True), tmp_path / "bad.py", {"control_mode": "lqr"}

@@ -26,9 +26,13 @@ success, msg, artifacts = render_gnn_to_cpomdp(
 
 Explicit `options` win over the `ModelParameters` hints. Specs without `goal_mean`/`control_gain` render as passive trackers (no control matrix, no EFE search).
 
+## State-dependent sensing
+
+When the spec declares `R_x_family` + `R_x_params` (see `docs/gnn/gnn_syntax.md` § v1.2 Extension) the emitted script builds a `CallableSensor` from a small in-script family library (`constant`, `quadratic_beacon`, `blind_spot`, `beacon_and_blind_spot`; each scales the nominal `R` by a positive factor of the planar position) and passes it to `LinearGaussianModel` via `observation=`. The goal type follows the sensor type: `ObservationGoal` under a `CallableSensor`, `StateGoal` under a fixed `R`; cpomdp refuses the other pairing when the `Agent` is built. The true observations are sampled with `R(x_true)`, the filter linearises at the predicted mean, and the EFE search sees the state-dependent noise — which is what lets the epistemic term differ across policies (`epistemic_by_policy_t0` in the results).
+
 ## Output
 
-One `.py` file. When executed it writes `simulation_results.json` under `CPOMDP_OUTPUT_DIR` (default `.`) with the continuous result schema (`beliefs`, `posterior_cov`, `true_states_continuous`, `observations_continuous`, `controls`, `rmse_vs_true`, `validation`) plus `efe_history` (per step, per policy), `epistemic_term`, `pragmatic_term`, `selected_policy_index`, `n_policies`, `search_warrant`, `sensor_kind`, `R_x_family` and `cpomdp_version`. The script exits 1 when `validation.all_valid` is false.
+One `.py` file. When executed it writes `simulation_results.json` under `CPOMDP_OUTPUT_DIR` (default `.`) with the continuous result schema (`beliefs`, `posterior_cov`, `true_states_continuous`, `observations_continuous`, `controls`, `rmse_vs_true`, `validation`) plus `efe_history` (per step, per policy), `epistemic_term`, `pragmatic_term`, `selected_policy_index`, `epistemic_by_policy_t0`, `pragmatic_by_policy_t0`, `n_policies`, `search_warrant`, `sensor_kind` (`fixed` | `state_dependent`), `R_x_family`, `R_x_params` and `cpomdp_version`. The script exits 1 when `validation.all_valid` is false.
 
 ## Dependencies
 

@@ -63,10 +63,15 @@ def render_gnn_to_cpomdp(
         output_path = Path(output_path)
         atomic_write_text(output_path, code)
         mode = resolved["control_mode"] if spec.has_control else "passive"
+        sensor = (
+            f"R(x) family {spec.R_x_family}"
+            if spec.has_state_dependent_sensor
+            else "fixed R"
+        )
         logger.info(f"✅ cpomdp continuous script written to: {output_path}")
         return (
             True,
-            f"cpomdp continuous script generated ({mode}): {output_path}",
+            f"cpomdp continuous script generated ({mode}, {sensor}): {output_path}",
             [str(output_path)],
         )
     except Exception as e:
