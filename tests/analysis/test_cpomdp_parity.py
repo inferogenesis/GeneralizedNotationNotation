@@ -26,6 +26,11 @@ from gnn.render.processor import render_gnn_spec
 REPO = Path(__file__).resolve().parents[2]
 CONTINUOUS_DIR = REPO / "input" / "gnn_files" / "continuous"
 FILES = sorted(CONTINUOUS_DIR.glob("*.md"))
+# Exemplars declaring a state-dependent R(x) sample their observations with
+# R(x_true) on cpomdp, so they are compared for the collapse/revival contrast
+# rather than for parity.
+STATE_DEPENDENT = [p for p in FILES if "R_x_family=" in p.read_text()]
+FIXED_R = [p for p in FILES if p not in STATE_DEPENDENT]
 
 pytestmark = [pytest.mark.slow, pytest.mark.needs_cpomdp]
 
@@ -55,7 +60,7 @@ def _render_and_run(
     return _run(Path(artifacts[0]), env_var, out_dir / "results")
 
 
-@pytest.mark.parametrize("source", FILES, ids=[p.stem for p in FILES])
+@pytest.mark.parametrize("source", FIXED_R, ids=[p.stem for p in FIXED_R])
 def test_parity_mode_matches_jax_rmse(source: Path, tmp_path: Path) -> None:
     jax_res = _render_and_run(source, "jax", tmp_path, None)
     cpomdp_res = _render_and_run(source, "cpomdp", tmp_path, {"control_mode": "parity"})
@@ -73,3 +78,27 @@ def test_parity_mode_matches_jax_rmse(source: Path, tmp_path: Path) -> None:
     if expected_mode == "parity":
         assert np.allclose(jax_res["controls"], cpomdp_res["controls"], atol=1e-6)
         assert len(cpomdp_res["efe_history"]) == cpomdp_res["num_timesteps"]
+
+
+@pytest.mark.parametrize(
+    "source", STATE_DEPENDENT, ids=[p.stem for p in STATE_DEPENDENT]
+)
+def test_state_dependent_exemplars_revive_the_epistemic_term(
+    source: Path, tmp_path: Path
+) -> None:
+    """Same file on jax and cpomdp: jax has no EFE record, cpomdp's varies."""
+    assert STATE_DEPENDENT, "expected R(x) exemplars under continuous/"
+    jax_res = _render_and_run(source, "jax", tmp_path, None)
+    cpomdp_res = _render_and_run(source, "cpomdp", tmp_path, None)
+    assert jax_res["efe_history"] == []
+    assert jax_res["validation"]["all_valid"] is True
+    assert cpomdp_res["control_mode"] == "efe"
+    assert cpomdp_res["sensor_kind"] == "state_dependent"
+    assert cpomdp_res["R_x_family"] in {"quadratic_beacon", "beacon_and_blind_spot"}
+    assert cpomdp_res["validation"]["all_valid"] is True
+    assert len(cpomdp_res["efe_history"]) == cpomdp_res["num_timesteps"]
+    t0 = cpomdp_res["epistemic_by_policy_t0"]
+    assert len(t0) == cpomdp_res["n_policies"] > 1
+    assert all(v > 0 for v in t0)
+    assert max(t0) - min(t0) > 1e-6, "epistemic term collapsed across policies"
+    assert all(v > 0 for v in cpomdp_res["epistemic_term"])

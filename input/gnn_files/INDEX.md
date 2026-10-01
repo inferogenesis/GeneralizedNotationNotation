@@ -6,14 +6,18 @@ execute it through the 25-step pipeline. For syntax and file-structure rules see
 [normative syntax](../../docs/gnn/reference/gnn_syntax.md) and the tutorials in
 [docs/gnn/tutorials/](../../docs/gnn/tutorials/).
 
-**Counts (measured 2026-09-01):** 29 runnable `.md` spec files across 10 task
+**Counts (measured 2026-10-01):** 31 runnable `.md` spec files across 10 task
 folders (`INDEX.md`, `AGENTS.md` and `README.md` are non-spec scaffolds and are
 excluded by `gnn.discovery.is_model_source_path`). 26 are discrete-state
-POMDP/HMM models that render and execute on all nine frameworks; the 3 files
-under `continuous/` are continuous-state linear-Gaussian models that render and
-execute on JAX, NumPyro, PyTorch, Stan and RxInfer.jl and are reported as
-`unsupported` (not failed) on the categorical backends PyMDP,
-ActiveInference.jl, DisCoPy and bnlearn. Live counts come from
+POMDP/HMM models that render and execute on the nine categorical-capable
+frameworks (cpomdp reports them `unsupported`); the 5 files under
+`continuous/` are continuous-state linear-Gaussian models that render and
+execute on JAX, NumPyro, PyTorch, Stan, RxInfer.jl and cpomdp and are reported
+as `unsupported` (not failed) on the categorical backends PyMDP,
+ActiveInference.jl, DisCoPy and bnlearn. Two of them (`curious_rocket.md`,
+`ecoli_chemotaxis.md`) declare a state-dependent observation noise
+`R_x_family` that only cpomdp realises; the other continuous backends keep the
+nominal `R` and say so in their render message. Live counts come from
 `output/11_render_output/render_processing_summary.json`.
 
 ## Choosing an example
@@ -26,6 +30,7 @@ ActiveInference.jl, DisCoPy and bnlearn. Live counts come from
 | Compare render targets / scaling | `pymdp_scaling_study/pymdp_scaling_N4_T100.md` (then N8…N64) |
 | Continuous-state (linear-Gaussian) models — passive filtering | `continuous/predictive_coding_agent.md`, `continuous/stochastic_dynamics.md` |
 | Continuous-state closed-loop control on beliefs | `continuous/continuous_navigation.md` |
+| Continuous-state active inference with a state-dependent sensor (cpomdp) | `continuous/curious_rocket.md` (beacon + blind spot), `continuous/ecoli_chemotaxis.md` (gradient climb) |
 | Multi-agent & stigmergy (v3+ features) | `multiagent/stigmergic_swarm.md` |
 | Hierarchical / deep temporal models | `hierarchical/hierarchical_pomdp.md` |
 | Parameter learning | `learning/dirichlet_likelihood_learning.md` |
@@ -40,6 +45,8 @@ ActiveInference.jl, DisCoPy and bnlearn. Live counts come from
 
 ### continuous/
 - [continuous_navigation.md](continuous/continuous_navigation.md)
+- [curious_rocket.md](continuous/curious_rocket.md)
+- [ecoli_chemotaxis.md](continuous/ecoli_chemotaxis.md)
 - [predictive_coding_agent.md](continuous/predictive_coding_agent.md)
 - [stochastic_dynamics.md](continuous/stochastic_dynamics.md)
 

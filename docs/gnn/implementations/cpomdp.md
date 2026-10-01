@@ -95,6 +95,12 @@ The other continuous backends keep the nominal `R` and append
 `state-dependent R declared, this backend uses nominal R` to their render
 message.
 
+Two exemplars exercise the path: `input/gnn_files/continuous/curious_rocket.md`
+(a thrusters-only rocket with a beacon that pulls and a blind spot that
+pushes, horizon 2) and `ecoli_chemotaxis.md` (a gradient climb whose sensing
+sharpens near the source). `tests/analysis/test_cpomdp_parity.py` renders
+both on jax and cpomdp and checks the collapse/revival contrast.
+
 ## Control modes
 
 | `control_mode` | Action | Purpose |

@@ -40,11 +40,13 @@ from gnn.render.rxinfer.rxinfer_renderer import render_gnn_to_rxinfer
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 GNN_FILES = PROJECT_ROOT / "input" / "gnn_files"
 
-EXEMPLAR_COUNT = 30
+EXEMPLAR_COUNT = 32
 
 # The intended kind for every non-flat exemplar; everything else is FLAT.
 EXPECTED_NON_FLAT = {
     "continuous/continuous_navigation.md": ModelKind.CONTINUOUS,
+    "continuous/curious_rocket.md": ModelKind.CONTINUOUS,
+    "continuous/ecoli_chemotaxis.md": ModelKind.CONTINUOUS,
     "continuous/predictive_coding_agent.md": ModelKind.CONTINUOUS,
     "continuous/stochastic_dynamics.md": ModelKind.CONTINUOUS,
     "hierarchical/hierarchical_pomdp.md": ModelKind.HIERARCHICAL,
@@ -356,9 +358,11 @@ class TestContinuousNativeCodegen:
         assert '"efe_per_action" => Vector{Vector{Float64}}(),' in code
         assert '"policy_posterior" => Vector{Vector{Float64}}(),' in code
 
-    def test_all_three_continuous_exemplars_render(self) -> None:
+    def test_all_continuous_exemplars_render(self) -> None:
         for stem in (
             "continuous_navigation",
+            "curious_rocket",
+            "ecoli_chemotaxis",
             "predictive_coding_agent",
             "stochastic_dynamics",
         ):

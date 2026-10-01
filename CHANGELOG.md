@@ -8,6 +8,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/) and [Semantic Ver
 
 ## [Unreleased]
 
+### Added (2026-10-01 — state-dependent observation noise on continuous models)
+
+- **GNN v1.2: `R_x_family` + `R_x_params`.** A continuous file may declare a
+  state-dependent observation noise `R(x)` on top of the nominal `R` through
+  two optional `InitialParameterization` keys with a closed vocabulary
+  (`constant`, `quadratic_beacon`, `blind_spot`, `beacon_and_blind_spot`) and
+  a fixed arity per family. `R` stays required, so model-kind detection and
+  the `F/H/Q/R` trigger are unchanged. `render.continuous_common` carries the
+  vocabulary and validates the pair at render time; Step 5 reports an unknown
+  family or a wrong-length vector as `[GNN-E007]`; Step 10 gains the
+  `StateDependentObservationNoise` term; the extractor keeps bare identifiers
+  as strings. The JAX, NumPyro, PyTorch, Stan and RxInfer.jl renderers keep
+  the nominal `R` and append "state-dependent R declared, this backend uses
+  nominal R" to their render message.
+- **cpomdp realises `R(x)`.** The emitted script builds a `CallableSensor`
+  from an in-script family library and steers with an `ObservationGoal`
+  (goal type follows sensor type; cpomdp refuses the other pairing). Results
+  gain `sensor_kind`, `R_x_params`, `epistemic_by_policy_t0` and
+  `pragmatic_by_policy_t0`, which show the epistemic term varying across
+  policies under `R(x)` and flat under a fixed `R`.
+- **Exemplars** `input/gnn_files/continuous/curious_rocket.md` (thrusters-only
+  rocket, one beacon and one blind spot, horizon 2) and
+  `ecoli_chemotaxis.md` (gradient climb with a `quadratic_beacon` on the
+  source; cites Mattingly et al. 2021, all numbers illustrative). Tests render
+  both on jax and cpomdp: empty `efe_history` on jax, a varying epistemic
+  column on cpomdp; the jax parity test now covers the fixed-`R` exemplars.
+
 ### Added (2026-09-25 — cpomdp continuous active inference backend)
 
 - **cpomdp render/execute/analysis backend.** A tenth render target,
