@@ -23,7 +23,7 @@ from gnn.render.processor import process_render
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXEMPLAR_DIR = REPO_ROOT / "input" / "gnn_files"
-EXPECTED_EXEMPLAR_COUNT = 30
+EXPECTED_EXEMPLAR_COUNT = 32
 
 
 def _count_exemplar_md_files() -> int:
